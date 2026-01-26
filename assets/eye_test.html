@@ -1,0 +1,803 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>CognitoSense - Saccade Experiment</title>
+    <script
+      src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"
+      crossorigin="anonymous"
+    ></script>
+
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #1a1a1a;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        overflow: hidden;
+      }
+
+      #experiment-container {
+        position: relative;
+        width: 800px;
+        height: 600px;
+        background: #000;
+        border: 3px solid #444;
+        margin-top: 10px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+        overflow: hidden;
+      }
+
+      #input_video {
+        display: none;
+      }
+
+      #output_canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0.4;
+        transform: scaleX(-1);
+      }
+
+      #ui-layer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 5;
+      }
+
+      /* GLOW Z-INDEX 100 */
+      .side-glow {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 200px;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.1s ease-in-out;
+        z-index: 100;
+      }
+
+      #glow-left {
+        left: 0;
+        background: linear-gradient(
+          to right,
+          rgba(0, 255, 0, 0.8),
+          transparent
+        );
+        border-left: 8px solid #00ff00;
+      }
+
+      #glow-right {
+        right: 0;
+        background: linear-gradient(to left, rgba(0, 255, 0, 0.8), transparent);
+        border-right: 8px solid #00ff00;
+      }
+
+      #task-instruction {
+        font-size: 28px;
+        font-weight: bold;
+        color: yellow;
+        position: absolute;
+        top: 20px;
+        width: 100%;
+        text-align: center;
+        text-shadow: 2px 2px 4px #000;
+        background: rgba(0, 0, 0, 0.5);
+        padding: 5px 0;
+        z-index: 5;
+      }
+
+      .dot {
+        width: 40px;
+        height: 40px;
+        background-color: red;
+        border-radius: 50%;
+        position: absolute;
+        display: none;
+        box-shadow: 0 0 15px red;
+      }
+
+      #fixation {
+        font-size: 60px;
+        color: white;
+        display: none;
+        text-shadow: 0 0 5px white;
+      }
+
+      #status-panel {
+        margin-top: 10px;
+        text-align: center;
+        z-index: 10;
+      }
+
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        margin: 5px;
+        transition: background 0.2s;
+      }
+      button:hover {
+        background: #0056b3;
+      }
+      button:disabled {
+        background: #555;
+        cursor: not-allowed;
+      }
+
+      #results-overlay,
+      #verification-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.95); /* Slightly darker for clean look */
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 20;
+      }
+
+      .verify-box {
+        background: #2a2a2a;
+        padding: 30px;
+        border-radius: 10px;
+        border: 2px solid #00d2ff;
+        text-align: center;
+        max-width: 600px;
+        z-index: 21;
+      }
+
+      .instruction-highlight {
+        color: #00ff00;
+        font-weight: bold;
+      }
+
+      label {
+        display: inline-block;
+        margin: 15px 0;
+        cursor: pointer;
+        font-size: 18px;
+        background: #333;
+        padding: 10px;
+        border-radius: 5px;
+      }
+      input[type="checkbox"] {
+        transform: scale(1.5);
+        margin-right: 10px;
+      }
+
+      table {
+        border-collapse: collapse;
+        width: 80%;
+        margin-bottom: 20px;
+        color: white;
+      }
+      th,
+      td {
+        border: 1px solid #555;
+        padding: 10px;
+        text-align: center;
+      }
+      th {
+        background-color: #333;
+      }
+      .correct {
+        color: #4caf50;
+      }
+      .wrong {
+        color: #f44336;
+      }
+
+      .calibration-indicator {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 18px;
+        background: rgba(0, 0, 0, 0.8);
+        padding: 15px 25px;
+        border-radius: 10px;
+        display: none;
+        color: #00ff00;
+        border: 1px solid #00ff00;
+      }
+
+      .debug-info {
+        font-size: 0.9em;
+        color: #aaa;
+        font-family: monospace;
+        margin-top: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>CognitoSense: Saccade Experiment</h1>
+
+    <div id="status-panel">
+      <p>
+        Status:
+        <span id="status-text" style="font-weight: bold; color: #00d2ff"
+          >Loading Model...</span
+        >
+      </p>
+      <div class="debug-info">
+        Diff: <span id="debug-val">--</span> | Stable:
+        <span id="debug-stable">--</span>
+      </div>
+      <button id="start-btn" disabled onclick="startSequence()">
+        Start Calibration
+      </button>
+    </div>
+
+    <div id="experiment-container">
+      <video id="input_video"></video>
+      <canvas id="output_canvas" width="800" height="600"></canvas>
+
+      <div id="glow-left" class="side-glow"></div>
+      <div id="glow-right" class="side-glow"></div>
+
+      <div id="ui-layer">
+        <div id="task-instruction"></div>
+        <div id="fixation">+</div>
+        <div id="target-left" class="dot" style="left: 10%"></div>
+        <div id="target-right" class="dot" style="right: 10%"></div>
+        <div id="calibration-indicator" class="calibration-indicator">
+          Calibrating... Keep Still
+        </div>
+      </div>
+
+      <div id="verification-overlay">
+        <div class="verify-box">
+          <h2>Check Direction</h2>
+          <p style="font-size: 18px; margin-bottom: 20px">
+            Look to the <b>LEFT</b> or <b>RIGHT</b>.<br />
+            You should see a
+            <span class="instruction-highlight">GREEN GLOW</span> on that side.
+          </p>
+
+          <p style="font-size: 14px; color: #ccc">
+            (The glow is now visible ON TOP of this box)
+          </p>
+
+          <label>
+            <input
+              type="checkbox"
+              id="invert-check"
+              onchange="toggleInvert()"
+            />
+            <b>Invert Direction</b><br />
+            <span style="font-size: 14px; color: #aaa"
+              >(Check this if looking Left makes the Right side glow)</span
+            >
+          </label>
+          <br />
+          <button onclick="endVerificationAndStart()">
+            Everything Works - Start Test
+          </button>
+        </div>
+      </div>
+
+      <div id="results-overlay">
+        <h2>Experiment Complete</h2>
+        <table id="results-table">
+          <thead>
+            <tr>
+              <th>Trial</th>
+              <th>Task</th>
+              <th>Target</th>
+              <th>User Looked</th>
+              <th>Time (ms)</th>
+              <th>Result</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <div>
+          <button onclick="sendResultsToAPI()">Send Results</button>
+          <button onclick="restartExperiment()">Restart</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // --- 1. SETUP & UTILS ---
+      const videoElement = document.getElementById("input_video");
+      const canvasElement = document.getElementById("output_canvas");
+      const canvasCtx = canvasElement.getContext("2d");
+      const statusText = document.getElementById("status-text");
+      const startBtn = document.getElementById("start-btn");
+      const instructionText = document.getElementById("task-instruction");
+      const debugValText = document.getElementById("debug-val");
+      const debugStableText = document.getElementById("debug-stable");
+      const resultsOverlay = document.getElementById("results-overlay");
+      const resultsTableBody = document.querySelector("#results-table tbody");
+      const calibrationIndicator = document.getElementById(
+        "calibration-indicator",
+      );
+
+      const glowLeft = document.getElementById("glow-left");
+      const glowRight = document.getElementById("glow-right");
+      const verificationOverlay = document.getElementById(
+        "verification-overlay",
+      );
+
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      let audioCtx = new AudioContext();
+
+      function playBeep() {
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        oscillator.type = "sine";
+        oscillator.frequency.value = 880;
+        gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+        oscillator.start();
+        oscillator.stop(audioCtx.currentTime + 0.1);
+      }
+
+      // --- 2. EYE TRACKING VARIABLES ---
+      const LEFT_EYE = { outer: 33, inner: 133, iris: 468 };
+      const RIGHT_EYE = { outer: 263, inner: 362, iris: 473 };
+
+      // Experiment State
+      const MAX_TRIALS = 4;
+      let currentTrialIndex = 0;
+      let experimentResults = [];
+      let isRunning = false;
+      let startTime = 0;
+      let inputReadyTime = 0;
+      let targetSide = "none";
+      let currentTask = "PRO";
+
+      // Calibration & Verification State
+      let calibrationSamples = [];
+      const CALIBRATION_SAMPLES = 40;
+      let isCalibrating = false;
+      let isVerifying = false;
+      let isInverted = false;
+      let baselineValue = 0.0;
+
+      // Detection Logic
+      let gazeHistory = [];
+      const GAZE_HISTORY_SIZE = 10;
+      const RESPONSE_THRESHOLD = 0.045;
+      const STABILIZATION_FRAMES = 8;
+      const MIN_REACTION_TIME_MS = 200;
+
+      // --- 3. CORE LOGIC ---
+
+      function toggleInvert() {
+        isInverted = document.getElementById("invert-check").checked;
+      }
+
+      function getEyeRatio(landmarks, eyeIndices) {
+        const p_outer = landmarks[eyeIndices.outer];
+        const p_inner = landmarks[eyeIndices.inner];
+        const p_iris = landmarks[eyeIndices.iris];
+
+        const distToInner = Math.hypot(
+          p_iris.x - p_inner.x,
+          p_iris.y - p_inner.y,
+        );
+        const eyeWidth = Math.hypot(
+          p_outer.x - p_inner.x,
+          p_outer.y - p_inner.y,
+        );
+
+        if (eyeWidth === 0) return 0.5;
+        return distToInner / eyeWidth;
+      }
+
+      function onResults(results) {
+        // If results overlay is displayed, stop drawing to save resources/clean view
+        if (resultsOverlay.style.display === "flex") return;
+
+        canvasCtx.save();
+        canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+        canvasCtx.drawImage(
+          results.image,
+          0,
+          0,
+          canvasElement.width,
+          canvasElement.height,
+        );
+
+        if (
+          results.multiFaceLandmarks &&
+          results.multiFaceLandmarks.length > 0
+        ) {
+          const landmarks = results.multiFaceLandmarks[0];
+
+          // A. Compute Ratios & Differential
+          const leftRatio = getEyeRatio(landmarks, LEFT_EYE);
+          const rightRatio = getEyeRatio(landmarks, RIGHT_EYE);
+          const rawGazeValue = leftRatio - rightRatio;
+
+          drawIris(landmarks[LEFT_EYE.iris]);
+          drawIris(landmarks[RIGHT_EYE.iris]);
+
+          // B. CALIBRATION PHASE
+          if (isCalibrating) {
+            calibrationSamples.push(rawGazeValue);
+            debugValText.innerText = "Calibrating...";
+
+            if (calibrationSamples.length >= CALIBRATION_SAMPLES) {
+              const sum = calibrationSamples.reduce((a, b) => a + b, 0);
+              baselineValue = sum / calibrationSamples.length;
+
+              isCalibrating = false;
+              calibrationIndicator.style.display = "none";
+              statusText.innerText = "Calibration Done.";
+              startVerification();
+            }
+            canvasCtx.restore();
+            return;
+          }
+
+          // C. REAL-TIME DETECTION
+          const deviation = rawGazeValue - baselineValue;
+          debugValText.innerText = deviation.toFixed(3);
+
+          let currentFrameDirection = "CENTER";
+          if (deviation > RESPONSE_THRESHOLD) {
+            currentFrameDirection = "LEFT";
+          } else if (deviation < -RESPONSE_THRESHOLD) {
+            currentFrameDirection = "RIGHT";
+          }
+
+          // D. STABILIZATION
+          gazeHistory.push(currentFrameDirection);
+          if (gazeHistory.length > GAZE_HISTORY_SIZE) gazeHistory.shift();
+
+          const counts = { LEFT: 0, RIGHT: 0, CENTER: 0 };
+          gazeHistory.forEach((d) => counts[d]++);
+
+          let stabilizedDirection = "CENTER";
+          if (counts.LEFT >= STABILIZATION_FRAMES) stabilizedDirection = "LEFT";
+          if (counts.RIGHT >= STABILIZATION_FRAMES)
+            stabilizedDirection = "RIGHT";
+
+          // --- INVERSION LOGIC ---
+          let finalDirection = stabilizedDirection;
+          if (isInverted && stabilizedDirection !== "CENTER") {
+            finalDirection = stabilizedDirection === "LEFT" ? "RIGHT" : "LEFT";
+          }
+
+          debugStableText.innerText = finalDirection;
+
+          // E. PERIPHERAL GLOW (VISUAL FEEDBACK)
+          if (finalDirection === "LEFT") {
+            glowLeft.style.opacity = "1";
+            glowRight.style.opacity = "0";
+          } else if (finalDirection === "RIGHT") {
+            glowLeft.style.opacity = "0";
+            glowRight.style.opacity = "1";
+          } else {
+            glowLeft.style.opacity = "0";
+            glowRight.style.opacity = "0";
+          }
+
+          // F. VERIFICATION PHASE STOP
+          if (isVerifying) {
+            canvasCtx.restore();
+            return;
+          }
+
+          // G. GAME LOGIC TRIGGER
+          if (isRunning && targetSide !== "none") {
+            const now = performance.now();
+            if (now < inputReadyTime) return;
+
+            if (finalDirection === "LEFT" || finalDirection === "RIGHT") {
+              handleUserResponse(finalDirection);
+            }
+          }
+        }
+        canvasCtx.restore();
+      }
+
+      function drawIris(point) {
+        const x = point.x * canvasElement.width;
+        const y = point.y * canvasElement.height;
+        canvasCtx.beginPath();
+        canvasCtx.arc(x, y, 4, 0, 2 * Math.PI);
+        canvasCtx.fillStyle = "#ff0000";
+        canvasCtx.fill();
+      }
+
+      // --- 4. EXPERIMENT FLOW ---
+
+      function startSequence() {
+        if (audioCtx.state === "suspended") audioCtx.resume();
+
+        // SHOW THE CANVAS AGAIN (was hidden in results)
+        canvasElement.style.display = "block";
+
+        currentTrialIndex = 0;
+        experimentResults = [];
+        startBtn.disabled = true;
+        resultsOverlay.style.display = "none";
+        verificationOverlay.style.display = "none";
+
+        // Reset Inversion default
+        document.getElementById("invert-check").checked = false;
+        isInverted = false;
+
+        glowLeft.style.opacity = "0";
+        glowRight.style.opacity = "0";
+
+        calibrationSamples = [];
+        isCalibrating = true;
+        calibrationIndicator.style.display = "block";
+        statusText.innerText = "Calibrating... Look at the Cross";
+        document.getElementById("fixation").style.display = "block";
+      }
+
+      function startVerification() {
+        isVerifying = true;
+        verificationOverlay.style.display = "flex";
+        statusText.innerText = "Look Left/Right to Test";
+        document.getElementById("fixation").style.display = "none";
+      }
+
+      function endVerificationAndStart() {
+        isVerifying = false;
+        verificationOverlay.style.display = "none";
+        glowLeft.style.opacity = "0";
+        glowRight.style.opacity = "0";
+        statusText.innerText = "Starting Trials...";
+        setTimeout(() => runNextTrial(), 1000);
+      }
+
+      function runNextTrial() {
+        if (currentTrialIndex >= MAX_TRIALS) {
+          showResults();
+          return;
+        }
+
+        gazeHistory = [];
+        glowLeft.style.opacity = "0";
+        glowRight.style.opacity = "0";
+
+        if (currentTrialIndex < 2) {
+          currentTask = "PRO";
+          instructionText.innerText = `Task: LOOK AT DOT`;
+          instructionText.style.color = "#4caf50";
+        } else {
+          currentTask = "ANTI";
+          instructionText.innerText = `Task: LOOK AWAY FROM DOT`;
+          instructionText.style.color = "#ff9800";
+        }
+
+        document.getElementById("target-left").style.display = "none";
+        document.getElementById("target-right").style.display = "none";
+        document.getElementById("fixation").style.display = "block";
+        statusText.innerText = `Trial ${currentTrialIndex + 1} / ${MAX_TRIALS}`;
+
+        const delay = 1500 + Math.random() * 1000;
+
+        setTimeout(() => {
+          document.getElementById("fixation").style.display = "none";
+
+          const isLeft = Math.random() < 0.5;
+          targetSide = isLeft ? "LEFT" : "RIGHT";
+
+          const dot = isLeft
+            ? document.getElementById("target-left")
+            : document.getElementById("target-right");
+          dot.style.display = "block";
+
+          playBeep();
+
+          startTime = performance.now();
+          inputReadyTime = startTime + MIN_REACTION_TIME_MS;
+
+          isRunning = true;
+          gazeHistory = [];
+        }, delay);
+      }
+
+      function handleUserResponse(detectedDirection) {
+        if (!isRunning) return;
+
+        isRunning = false;
+        const endTime = performance.now();
+        const reactionTime = Math.round(endTime - startTime);
+
+        document.getElementById("target-left").style.display = "none";
+        document.getElementById("target-right").style.display = "none";
+
+        glowLeft.style.opacity = "0";
+        glowRight.style.opacity = "0";
+
+        let isCorrect = false;
+        if (currentTask === "PRO") {
+          if (detectedDirection === targetSide) isCorrect = true;
+        } else {
+          if (targetSide === "LEFT" && detectedDirection === "RIGHT")
+            isCorrect = true;
+          if (targetSide === "RIGHT" && detectedDirection === "LEFT")
+            isCorrect = true;
+        }
+
+        experimentResults.push({
+          trial: currentTrialIndex + 1,
+          task: currentTask,
+          target: targetSide,
+          response: detectedDirection,
+          rt: reactionTime,
+          correct: isCorrect,
+        });
+
+        statusText.innerText = `${isCorrect ? "✓ CORRECT" : "✗ INCORRECT"} (${reactionTime}ms)`;
+
+        currentTrialIndex++;
+        setTimeout(runNextTrial, 2000);
+      }
+
+      function showResults() {
+        statusText.innerText = "Experiment Complete";
+        instructionText.innerText = "";
+        startBtn.disabled = false;
+
+        // HIDE THE GAZING THINGS
+        canvasElement.style.display = "none";
+        glowLeft.style.opacity = "0";
+        glowRight.style.opacity = "0";
+
+        resultsTableBody.innerHTML = "";
+
+        experimentResults.forEach((row) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+                <td>${row.trial}</td>
+                <td>${row.task}</td>
+                <td>${row.target}</td>
+                <td>${row.response}</td>
+                <td>${row.rt}</td>
+                <td class="${row.correct ? "correct" : "wrong"}">
+                    ${row.correct ? "✓" : "✗"}
+                </td>
+            `;
+          resultsTableBody.appendChild(tr);
+        });
+
+        resultsOverlay.style.display = "flex";
+      }
+      function computeMetrics() {
+        const totalTrials = experimentResults.length;
+        const correctTrials = experimentResults.filter((r) => r.correct).length;
+        const accuracy = totalTrials > 0 ? correctTrials / totalTrials : 0;
+
+        const reactionTimes = experimentResults.map((r) => r.rt);
+        const avgRT =
+          reactionTimes.length > 0
+            ? Math.round(
+                reactionTimes.reduce((a, b) => a + b, 0) / reactionTimes.length,
+              )
+            : 0;
+
+        const proTrials = experimentResults.filter((r) => r.task === "PRO");
+        const antiTrials = experimentResults.filter((r) => r.task === "ANTI");
+
+        const proAccuracy =
+          proTrials.length > 0
+            ? proTrials.filter((r) => r.correct).length / proTrials.length
+            : 0;
+
+        const antiAccuracy =
+          antiTrials.length > 0
+            ? antiTrials.filter((r) => r.correct).length / antiTrials.length
+            : 0;
+
+        return {
+          total_trials: totalTrials,
+          correct_trials: correctTrials,
+          accuracy: accuracy,
+          avg_reaction_time_ms: avgRT,
+          pro_accuracy: proAccuracy,
+          anti_accuracy: antiAccuracy,
+        };
+      }
+
+      async function sendResultsToAPI() {
+        const metrics = computeMetrics();
+
+        const payload = {
+          userId: "abc", // MUST match CSV user_id
+          eyeTrackingResult: {
+            metrics,
+            trials: experimentResults,
+            timestamp: new Date().toISOString(),
+          },
+        };
+
+        console.log("📤 Sending eye tracking payload:", payload);
+
+        try {
+          const response = await fetch(
+            "http://192.168.1.4:4000/api/eye-tracking",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            },
+          );
+
+          const result = await response.json();
+          console.log("✅ Backend response:", result);
+          alert("✅ Eye tracking saved!");
+        } catch (err) {
+          console.error("❌ API error:", err);
+          alert("❌ Failed to send data");
+        }
+      }
+
+      function restartExperiment() {
+        resultsOverlay.style.display = "none";
+        startSequence();
+      }
+
+      // --- 5. INITIALIZATION ---
+      const faceMesh = new FaceMesh({
+        locateFile: (file) =>
+          `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`,
+      });
+      faceMesh.setOptions({
+        maxNumFaces: 1,
+        refineLandmarks: true,
+        minDetectionConfidence: 0.5,
+        minTrackingConfidence: 0.5,
+      });
+      faceMesh.onResults(onResults);
+
+      const camera = new Camera(videoElement, {
+        onFrame: async () => {
+          await faceMesh.send({ image: videoElement });
+        },
+        width: 800,
+        height: 600,
+      });
+
+      camera.start().then(() => {
+        statusText.innerText = "System Ready. Please Sit Still.";
+        startBtn.disabled = false;
+      });
+    </script>
+  </body>
+</html>
