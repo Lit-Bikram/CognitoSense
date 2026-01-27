@@ -1,12 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from "react";
 import { useAuth } from "../../../context/AuthContext";
 
-const COLORS = ['RED', 'GREEN', 'BLUE'];
+const COLORS = ["RED", "GREEN", "BLUE"];
 
 const COLOR_MAP = {
-  RED: '#e74c3c',
-  GREEN: '#27ae60',
-  BLUE: '#2980b9',
+  RED: "#e74c3c",
+  GREEN: "#27ae60",
+  BLUE: "#2980b9",
 };
 
 // Confetti Component
@@ -15,23 +15,35 @@ const Confetti = () => {
     id: i,
     left: Math.random() * 100,
     animationDelay: Math.random() * 3,
-    backgroundColor: ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#6c5ce7'][Math.floor(Math.random() * 5)],
+    backgroundColor: ["#ff6b6b", "#4ecdc4", "#45b7d1", "#f9ca24", "#6c5ce7"][
+      Math.floor(Math.random() * 5)
+    ],
   }));
 
   return (
-    <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 9999 }}>
+    <div
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        pointerEvents: "none",
+        zIndex: 9999,
+      }}
+    >
       {confettiPieces.map((piece) => (
         <div
           key={piece.id}
           style={{
-            position: 'absolute',
+            position: "absolute",
             left: `${piece.left}%`,
-            top: '-10px',
-            width: '10px',
-            height: '10px',
+            top: "-10px",
+            width: "10px",
+            height: "10px",
             backgroundColor: piece.backgroundColor,
             animation: `fall 3s linear ${piece.animationDelay}s infinite`,
-            borderRadius: Math.random() > 0.5 ? '50%' : '0',
+            borderRadius: Math.random() > 0.5 ? "50%" : "0",
           }}
         />
       ))}
@@ -49,7 +61,7 @@ const Confetti = () => {
 
 export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
   const [level, setLevel] = useState(1);
-  const [rule, setRule] = useState('WORD');
+  const [rule, setRule] = useState("WORD");
   const [cloth, setCloth] = useState<any>(null);
   const [finished, setFinished] = useState(false);
   const [correct, setCorrect] = useState(0);
@@ -69,11 +81,11 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
   const dragOffset = useRef({ x: 0, y: 0 });
 
   const levelConfig: Record<number, any> = {
-    1: { rule: 'WORD', congruentProb: 0.8 },
-    2: { rule: 'COLOR', congruentProb: 0.8 },
-    3: { rule: 'MIX', congruentProb: 0.5 },
-    4: { rule: 'MIX', congruentProb: 0.35 },
-    5: { rule: 'MIX', congruentProb: 0.2 },
+    1: { rule: "WORD", congruentProb: 0.8 },
+    2: { rule: "COLOR", congruentProb: 0.8 },
+    3: { rule: "MIX", congruentProb: 0.5 },
+    4: { rule: "MIX", congruentProb: 0.35 },
+    5: { rule: "MIX", congruentProb: 0.2 },
   };
 
   const createCloth = (lvl: number) => {
@@ -96,7 +108,8 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
       return;
     }
     const cfg = levelConfig[currentLevel];
-    const nextRule = cfg.rule === 'MIX' ? (Math.random() > 0.5 ? 'WORD' : 'COLOR') : cfg.rule;
+    const nextRule =
+      cfg.rule === "MIX" ? (Math.random() > 0.5 ? "WORD" : "COLOR") : cfg.rule;
     setRule(nextRule);
     setCloth(createCloth(currentLevel));
     setDragPos({ x: 0, y: 0 });
@@ -117,7 +130,6 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
     }
   }, [finished]);
 
-
   async function submitLaundrySorterResult() {
     if (!isAuthenticated || !username) {
       console.warn("User not authenticated, skipping game logging");
@@ -125,8 +137,7 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
     }
 
     const totalAttempts = logs.current.length;
-    const accuracy =
-      totalAttempts > 0 ? correct / totalAttempts : 0;
+    const accuracy = totalAttempts > 0 ? correct / totalAttempts : 0;
 
     const avgReactionTime =
       totalAttempts > 0
@@ -135,7 +146,7 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
         : 0;
 
     try {
-      await fetch("http://192.168.1.4:4000/api/game", {
+      await fetch("https://cognito-sense-backend-4.onrender.com/api/game", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -160,7 +171,7 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
     e.preventDefault();
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    
+
     dragStart.current = { x: clientX, y: clientY };
     dragOffset.current = { x: dragPos.x, y: dragPos.y };
     setIsDragging(true);
@@ -169,13 +180,13 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
   const handleMouseMove = (e: any) => {
     if (!isDragging) return;
     e.preventDefault();
-    
+
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    
+
     const deltaX = clientX - dragStart.current.x;
     const deltaY = clientY - dragStart.current.y;
-    
+
     setDragPos({
       x: dragOffset.current.x + deltaX,
       y: dragOffset.current.y + deltaY,
@@ -188,13 +199,13 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
 
     const cardEl = cardRef.current;
     if (!cardEl) return;
-    
+
     const cardRect = cardEl.getBoundingClientRect();
     const cardCenterX = cardRect.left + cardRect.width / 2;
     const cardCenterY = cardRect.top + cardRect.height / 2;
 
-    let droppedOn = 'NONE';
-    
+    let droppedOn = "NONE";
+
     for (const color of COLORS) {
       const zoneEl = zoneRefs.current[color];
       if (zoneEl) {
@@ -211,8 +222,8 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
       }
     }
 
-    const correctLabel = rule === 'WORD' ? cloth.word : cloth.color;
-    const isCorrect = droppedOn !== 'NONE' && droppedOn === correctLabel;
+    const correctLabel = rule === "WORD" ? cloth.word : cloth.color;
+    const isCorrect = droppedOn !== "NONE" && droppedOn === correctLabel;
     const rt = (Date.now() - lastActionTime.current) / 1000;
 
     const debug = {
@@ -222,7 +233,7 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
       droppedOn: droppedOn,
       correctAnswer: correctLabel,
       yourAnswer: droppedOn,
-      result: isCorrect ? 'CORRECT ✓' : 'WRONG ✗'
+      result: isCorrect ? "CORRECT ✓" : "WRONG ✗",
     };
     setDebugInfo(debug);
 
@@ -239,10 +250,10 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
 
     if (isCorrect) {
       setCorrect((c) => c + 1);
-      setShowFeedback('correct');
+      setShowFeedback("correct");
     } else {
       setWrong((w) => w + 1);
-      setShowFeedback('wrong');
+      setShowFeedback("wrong");
     }
 
     setTimeout(() => {
@@ -255,16 +266,16 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
 
   useEffect(() => {
     if (isDragging) {
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
-      window.addEventListener('touchmove', handleMouseMove);
-      window.addEventListener('touchend', handleMouseUp);
-      
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
+      window.addEventListener("touchmove", handleMouseMove);
+      window.addEventListener("touchend", handleMouseUp);
+
       return () => {
-        window.removeEventListener('mousemove', handleMouseMove);
-        window.removeEventListener('mouseup', handleMouseUp);
-        window.removeEventListener('touchmove', handleMouseMove);
-        window.removeEventListener('touchend', handleMouseUp);
+        window.removeEventListener("mousemove", handleMouseMove);
+        window.removeEventListener("mouseup", handleMouseUp);
+        window.removeEventListener("touchmove", handleMouseMove);
+        window.removeEventListener("touchend", handleMouseUp);
       };
     }
   }, [isDragging, cloth, rule, level, dragPos]);
@@ -288,153 +299,283 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
   // };
 
   const totalAttempts = logs.current.length;
-  const accuracy = totalAttempts > 0 ? ((correct / totalAttempts) * 100).toFixed(1) : '0';
-  const avgReactionTime = totalAttempts > 0 
-    ? (logs.current.reduce((sum, log) => sum + log.reactionTime_s, 0) / totalAttempts).toFixed(2)
-    : '0';
+  const accuracy =
+    totalAttempts > 0 ? ((correct / totalAttempts) * 100).toFixed(1) : "0";
+  const avgReactionTime =
+    totalAttempts > 0
+      ? (
+          logs.current.reduce((sum, log) => sum + log.reactionTime_s, 0) /
+          totalAttempts
+        ).toFixed(2)
+      : "0";
 
   if (finished) {
     return (
-      <div style={{
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        backgroundImage: 'url("https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=1600")',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundBlendMode: 'multiply',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: '20px',
-        fontFamily: 'system-ui, -apple-system, sans-serif',
-        position: 'relative',
-      }}>
+      <div
+        style={{
+          minHeight: "100vh",
+          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+          backgroundImage:
+            'url("https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=1600")',
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundBlendMode: "multiply",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          padding: "20px",
+          fontFamily: "system-ui, -apple-system, sans-serif",
+          position: "relative",
+        }}
+      >
         <Confetti />
-        
+
         {onBack && (
           <button
             onClick={onBack}
             style={{
-              position: 'fixed',
-              top: '20px',
-              left: '20px',
-              padding: '12px 24px',
-              fontSize: '18px',
-              fontWeight: 'bold',
-              color: 'white',
-              background: 'rgba(0, 0, 0, 0.4)',
-              border: '3px solid rgba(255, 255, 255, 0.6)',
-              borderRadius: '15px',
-              cursor: 'pointer',
-              backdropFilter: 'blur(10px)',
-              transition: 'all 0.3s',
+              position: "fixed",
+              top: "20px",
+              left: "20px",
+              padding: "12px 24px",
+              fontSize: "18px",
+              fontWeight: "bold",
+              color: "white",
+              background: "rgba(0, 0, 0, 0.4)",
+              border: "3px solid rgba(255, 255, 255, 0.6)",
+              borderRadius: "15px",
+              cursor: "pointer",
+              backdropFilter: "blur(10px)",
+              transition: "all 0.3s",
               zIndex: 1000,
-              boxShadow: '0 8px 20px rgba(0,0,0,0.3)',
+              boxShadow: "0 8px 20px rgba(0,0,0,0.3)",
             }}
           >
             ← Main Menu
           </button>
         )}
-        
-        <div style={{
-          background: 'rgba(255, 255, 255, 0.98)',
-          borderRadius: '35px',
-          padding: '60px',
-          maxWidth: '700px',
-          width: '100%',
-          boxShadow: '0 30px 80px rgba(0,0,0,0.5)',
-          border: '5px solid rgba(138, 101, 185, 0.5)',
-        }}>
-          <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-            <div style={{ fontSize: '100px', marginBottom: '15px' }}>🎉</div>
-            <h2 style={{ fontSize: '48px', margin: '0', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', fontWeight: '900' }}>
+
+        <div
+          style={{
+            background: "rgba(255, 255, 255, 0.98)",
+            borderRadius: "35px",
+            padding: "60px",
+            maxWidth: "700px",
+            width: "100%",
+            boxShadow: "0 30px 80px rgba(0,0,0,0.5)",
+            border: "5px solid rgba(138, 101, 185, 0.5)",
+          }}
+        >
+          <div style={{ textAlign: "center", marginBottom: "40px" }}>
+            <div style={{ fontSize: "100px", marginBottom: "15px" }}>🎉</div>
+            <h2
+              style={{
+                fontSize: "48px",
+                margin: "0",
+                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                fontWeight: "900",
+              }}
+            >
               Game Complete!
             </h2>
-            <p style={{ fontSize: '18px', color: '#666', marginTop: '10px', fontWeight: '600' }}>
+            <p
+              style={{
+                fontSize: "18px",
+                color: "#666",
+                marginTop: "10px",
+                fontWeight: "600",
+              }}
+            >
               Well done! Here are your results
             </p>
           </div>
-          
+
           {/* Stats Grid */}
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: '1fr 1fr', 
-            gap: '25px',
-            marginBottom: '40px'
-          }}>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "25px",
+              marginBottom: "40px",
+            }}
+          >
             {/* Correct */}
-            <div style={{
-              background: 'linear-gradient(135deg, #2ecc71 0%, #27ae60 100%)',
-              padding: '30px',
-              borderRadius: '20px',
-              textAlign: 'center',
-              boxShadow: '0 10px 30px rgba(46,204,113,0.4)',
-              transform: 'translateY(0)',
-              transition: 'transform 0.3s',
-            }}>
-              <div style={{ fontSize: '50px', marginBottom: '10px' }}>✅</div>
-              <div style={{ fontSize: '48px', fontWeight: '900', color: 'white', marginBottom: '5px' }}>{correct}</div>
-              <div style={{ fontSize: '18px', color: 'rgba(255,255,255,0.95)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px' }}>Correct</div>
+            <div
+              style={{
+                background: "linear-gradient(135deg, #2ecc71 0%, #27ae60 100%)",
+                padding: "30px",
+                borderRadius: "20px",
+                textAlign: "center",
+                boxShadow: "0 10px 30px rgba(46,204,113,0.4)",
+                transform: "translateY(0)",
+                transition: "transform 0.3s",
+              }}
+            >
+              <div style={{ fontSize: "50px", marginBottom: "10px" }}>✅</div>
+              <div
+                style={{
+                  fontSize: "48px",
+                  fontWeight: "900",
+                  color: "white",
+                  marginBottom: "5px",
+                }}
+              >
+                {correct}
+              </div>
+              <div
+                style={{
+                  fontSize: "18px",
+                  color: "rgba(255,255,255,0.95)",
+                  fontWeight: "700",
+                  textTransform: "uppercase",
+                  letterSpacing: "1px",
+                }}
+              >
+                Correct
+              </div>
             </div>
-            
+
             {/* Wrong */}
-            <div style={{
-              background: 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)',
-              padding: '30px',
-              borderRadius: '20px',
-              textAlign: 'center',
-              boxShadow: '0 10px 30px rgba(231,76,60,0.4)',
-            }}>
-              <div style={{ fontSize: '50px', marginBottom: '10px' }}>❌</div>
-              <div style={{ fontSize: '48px', fontWeight: '900', color: 'white', marginBottom: '5px' }}>{wrong}</div>
-              <div style={{ fontSize: '18px', color: 'rgba(255,255,255,0.95)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px' }}>Wrong</div>
+            <div
+              style={{
+                background: "linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)",
+                padding: "30px",
+                borderRadius: "20px",
+                textAlign: "center",
+                boxShadow: "0 10px 30px rgba(231,76,60,0.4)",
+              }}
+            >
+              <div style={{ fontSize: "50px", marginBottom: "10px" }}>❌</div>
+              <div
+                style={{
+                  fontSize: "48px",
+                  fontWeight: "900",
+                  color: "white",
+                  marginBottom: "5px",
+                }}
+              >
+                {wrong}
+              </div>
+              <div
+                style={{
+                  fontSize: "18px",
+                  color: "rgba(255,255,255,0.95)",
+                  fontWeight: "700",
+                  textTransform: "uppercase",
+                  letterSpacing: "1px",
+                }}
+              >
+                Wrong
+              </div>
             </div>
 
             {/* Accuracy */}
-            <div style={{
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              padding: '30px',
-              borderRadius: '20px',
-              textAlign: 'center',
-              boxShadow: '0 10px 30px rgba(102,126,234,0.4)',
-            }}>
-              <div style={{ fontSize: '50px', marginBottom: '10px' }}>🎯</div>
-              <div style={{ fontSize: '48px', fontWeight: '900', color: 'white', marginBottom: '5px' }}>{accuracy}%</div>
-              <div style={{ fontSize: '18px', color: 'rgba(255,255,255,0.95)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px' }}>Accuracy</div>
+            <div
+              style={{
+                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                padding: "30px",
+                borderRadius: "20px",
+                textAlign: "center",
+                boxShadow: "0 10px 30px rgba(102,126,234,0.4)",
+              }}
+            >
+              <div style={{ fontSize: "50px", marginBottom: "10px" }}>🎯</div>
+              <div
+                style={{
+                  fontSize: "48px",
+                  fontWeight: "900",
+                  color: "white",
+                  marginBottom: "5px",
+                }}
+              >
+                {accuracy}%
+              </div>
+              <div
+                style={{
+                  fontSize: "18px",
+                  color: "rgba(255,255,255,0.95)",
+                  fontWeight: "700",
+                  textTransform: "uppercase",
+                  letterSpacing: "1px",
+                }}
+              >
+                Accuracy
+              </div>
             </div>
 
             {/* Avg Reaction Time */}
-            <div style={{
-              background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-              padding: '30px',
-              borderRadius: '20px',
-              textAlign: 'center',
-              boxShadow: '0 10px 30px rgba(240,147,251,0.4)',
-            }}>
-              <div style={{ fontSize: '50px', marginBottom: '10px' }}>⚡</div>
-              <div style={{ fontSize: '48px', fontWeight: '900', color: 'white', marginBottom: '5px' }}>{avgReactionTime}s</div>
-              <div style={{ fontSize: '18px', color: 'rgba(255,255,255,0.95)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px' }}>Avg Time</div>
+            <div
+              style={{
+                background: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+                padding: "30px",
+                borderRadius: "20px",
+                textAlign: "center",
+                boxShadow: "0 10px 30px rgba(240,147,251,0.4)",
+              }}
+            >
+              <div style={{ fontSize: "50px", marginBottom: "10px" }}>⚡</div>
+              <div
+                style={{
+                  fontSize: "48px",
+                  fontWeight: "900",
+                  color: "white",
+                  marginBottom: "5px",
+                }}
+              >
+                {avgReactionTime}s
+              </div>
+              <div
+                style={{
+                  fontSize: "18px",
+                  color: "rgba(255,255,255,0.95)",
+                  fontWeight: "700",
+                  textTransform: "uppercase",
+                  letterSpacing: "1px",
+                }}
+              >
+                Avg Time
+              </div>
             </div>
           </div>
 
           {/* Total Attempts */}
-          <div style={{
-            background: 'linear-gradient(135deg, rgba(102,126,234,0.1) 0%, rgba(118,75,162,0.1) 100%)',
-            padding: '25px',
-            borderRadius: '20px',
-            textAlign: 'center',
-            marginBottom: '35px',
-            border: '3px solid rgba(102,126,234,0.3)',
-          }}>
-            <div style={{ fontSize: '24px', fontWeight: '900', color: '#667eea', marginBottom: '8px' }}>
+          <div
+            style={{
+              background:
+                "linear-gradient(135deg, rgba(102,126,234,0.1) 0%, rgba(118,75,162,0.1) 100%)",
+              padding: "25px",
+              borderRadius: "20px",
+              textAlign: "center",
+              marginBottom: "35px",
+              border: "3px solid rgba(102,126,234,0.3)",
+            }}
+          >
+            <div
+              style={{
+                fontSize: "24px",
+                fontWeight: "900",
+                color: "#667eea",
+                marginBottom: "8px",
+              }}
+            >
               {totalAttempts}
             </div>
-            <div style={{ fontSize: '16px', color: '#764ba2', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px' }}>
+            <div
+              style={{
+                fontSize: "16px",
+                color: "#764ba2",
+                fontWeight: "700",
+                textTransform: "uppercase",
+                letterSpacing: "1px",
+              }}
+            >
               Total Attempts
             </div>
           </div>
-          
+
           {/* Download Button
           <button
             onClick={downloadCSV}
@@ -573,7 +714,8 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
                   textAlign: "center",
                 }}
               >
-                Level {level} / 5 • Match by {rule === "WORD" ? "📝 WORD" : "🎨 COLOR"}
+                Level {level} / 5 • Match by{" "}
+                {rule === "WORD" ? "📝 WORD" : "🎨 COLOR"}
               </p>
 
               <p
@@ -587,8 +729,8 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
               >
                 {rule === "WORD" ? (
                   <>
-                    📝 The word says "<strong>{cloth?.word}</strong>" - Drag to the{" "}
-                    <strong>{cloth?.word}</strong> zone!
+                    📝 The word says "<strong>{cloth?.word}</strong>" - Drag to
+                    the <strong>{cloth?.word}</strong> zone!
                   </>
                 ) : (
                   <>
@@ -619,7 +761,13 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
                   border: "3px solid rgba(46, 213, 115, 0.6)",
                 }}
               >
-                <span style={{ color: "white", fontSize: "24px", fontWeight: "900" }}>
+                <span
+                  style={{
+                    color: "white",
+                    fontSize: "24px",
+                    fontWeight: "900",
+                  }}
+                >
                   ✅ {correct}
                 </span>
               </div>
@@ -632,7 +780,13 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
                   border: "3px solid rgba(231, 76, 60, 0.6)",
                 }}
               >
-                <span style={{ color: "white", fontSize: "24px", fontWeight: "900" }}>
+                <span
+                  style={{
+                    color: "white",
+                    fontSize: "24px",
+                    fontWeight: "900",
+                  }}
+                >
                   ❌ {wrong}
                 </span>
               </div>
@@ -689,7 +843,8 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
                 style={{
                   width: "140px",
                   height: "140px",
-                  background: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+                  background:
+                    "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
                   borderRadius: "25px",
                   display: "flex",
                   flexDirection: "column",
@@ -722,5 +877,4 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
       </div>
     </div>
   );
-
 }

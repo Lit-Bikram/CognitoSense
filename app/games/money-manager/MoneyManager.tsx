@@ -75,7 +75,6 @@ export default function MoneyManager({ onBack }: { onBack?: () => void } = {}) {
     setIndex((prev) => prev + 1);
   };
 
-
   const resetGame = () => {
     setSpent(0);
     setIndex(0);
@@ -110,7 +109,7 @@ export default function MoneyManager({ onBack }: { onBack?: () => void } = {}) {
     logs: MoneyLog[],
     correct: number,
     wrong: number,
-    isAuthenticated: boolean
+    isAuthenticated: boolean,
   ) {
     if (!isAuthenticated || !username) {
       console.warn("User not authenticated, skipping money manager logging");
@@ -127,7 +126,7 @@ export default function MoneyManager({ onBack }: { onBack?: () => void } = {}) {
     const overBudgetCount = logs.filter((l) => l.overBudget).length;
 
     try {
-      await fetch("http://192.168.1.4:4000/api/game", {
+      await fetch("https://cognito-sense-backend-4.onrender.com/api/game", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -156,10 +155,16 @@ export default function MoneyManager({ onBack }: { onBack?: () => void } = {}) {
 
   useEffect(() => {
     if (gameOver && logs.length > 0) {
-      submitMoneyManagerResult(username!, logs, correct, wrong, isAuthenticated);
+      submitMoneyManagerResult(
+        username!,
+        logs,
+        correct,
+        wrong,
+        isAuthenticated,
+      );
     }
   }, [gameOver]);
-  
+
   // Main Menu
   if (!gameStarted) {
     return (
@@ -201,7 +206,7 @@ export default function MoneyManager({ onBack }: { onBack?: () => void } = {}) {
       </div>
     );
   }
-  
+
   // Results Screen
   if (!item) {
     const mustTotal = logs.filter((l) => l.must).length;

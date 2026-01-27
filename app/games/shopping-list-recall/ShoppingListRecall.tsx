@@ -1,16 +1,16 @@
-import { useAuth } from "../../../context/AuthContext";
-import React, { useEffect, useRef, useState } from 'react';
-import Confetti from 'react-confetti';
+import React, { useEffect, useRef, useState } from "react";
+import Confetti from "react-confetti";
 import {
-  FlatList,
-  Image,
-  ImageBackground,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+    FlatList,
+    Image,
+    ImageBackground,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
+import { useAuth } from "../../../context/AuthContext";
 
 /* ---------------- TYPES ---------------- */
 
@@ -29,25 +29,35 @@ type LevelMetrics = {
 /* ---------------- DATA ---------------- */
 
 const ITEM_POOL = [
-  { name: 'Milk', img: 'https://cdn-icons-png.flaticon.com/512/684/684631.png' },
-  { name: 'Bread', img: require('../../../assets/images/white-bread.png') },
-  { name: 'Eggs', img: 'https://cdn-icons-png.flaticon.com/512/2713/2713474.png' },
-  { name: 'Apple', img: 'https://cdn-icons-png.flaticon.com/512/415/415682.png' },
-  { name: 'Banana', img: require('../../../assets/images/banana.png') },
-  { name: 'Rice', img: require('../../../assets/images/rice.png') },
-  { name: 'Cheese', img: require('../../../assets/images/cheese.png') },
-  { name: 'Fish', img: require('../../../assets/images/fish.png') },
-  { name: 'Chicken', img: require('../../../assets/images/chicken-leg.png') },
-  { name: 'Potato', img: require('../../../assets/images/fried-potatoes.png') },
-  { name: 'Onion', img: require('../../../assets/images/onion.png') },
-  { name: 'Tomato', img: require('../../../assets/images/tomato.png') },
+  {
+    name: "Milk",
+    img: "https://cdn-icons-png.flaticon.com/512/684/684631.png",
+  },
+  { name: "Bread", img: require("../../../assets/images/white-bread.png") },
+  {
+    name: "Eggs",
+    img: "https://cdn-icons-png.flaticon.com/512/2713/2713474.png",
+  },
+  {
+    name: "Apple",
+    img: "https://cdn-icons-png.flaticon.com/512/415/415682.png",
+  },
+  { name: "Banana", img: require("../../../assets/images/banana.png") },
+  { name: "Rice", img: require("../../../assets/images/rice.png") },
+  { name: "Cheese", img: require("../../../assets/images/cheese.png") },
+  { name: "Fish", img: require("../../../assets/images/fish.png") },
+  { name: "Chicken", img: require("../../../assets/images/chicken-leg.png") },
+  { name: "Potato", img: require("../../../assets/images/fried-potatoes.png") },
+  { name: "Onion", img: require("../../../assets/images/onion.png") },
+  { name: "Tomato", img: require("../../../assets/images/tomato.png") },
 ];
 
 /* ---------------- HELPERS ---------------- */
 
 const shuffle = (arr: any[]) => [...arr].sort(() => Math.random() - 0.5);
 
-const getImageSource = (img: any) => (typeof img === 'string' ? { uri: img } : img);
+const getImageSource = (img: any) =>
+  typeof img === "string" ? { uri: img } : img;
 
 // const downloadCSV = (rows: LevelMetrics[]) => {
 //   if (typeof document === 'undefined' || typeof Blob === 'undefined' || typeof URL === 'undefined') {
@@ -78,8 +88,9 @@ const getImageSource = (img: any) => (typeof img === 'string' ? { uri: img } : i
 
 export default function ShoppingListRecall({ onBack }: { onBack: () => void }) {
   const [level, setLevel] = useState(1);
-  const [phase, setPhase] =
-    useState<'memorize' | 'recall' | 'result' | 'final'>('memorize');
+  const [phase, setPhase] = useState<
+    "memorize" | "recall" | "result" | "final"
+  >("memorize");
 
   const [targets, setTargets] = useState<any[]>([]);
   const [pool, setPool] = useState<any[]>([]);
@@ -89,7 +100,6 @@ export default function ShoppingListRecall({ onBack }: { onBack: () => void }) {
   const [hintItem, setHintItem] = useState<any | null>(null);
   const [hintUses, setHintUses] = useState(0);
   const { username, isAuthenticated } = useAuth();
-
 
   const startTime = useRef(0);
   const lastClick = useRef(0);
@@ -104,7 +114,7 @@ export default function ShoppingListRecall({ onBack }: { onBack: () => void }) {
   /* --------- INIT LEVEL --------- */
   useEffect(() => {
     const t = shuffle(ITEM_POOL).slice(0, ITEMS_PER_LEVEL);
-    const rest = ITEM_POOL.filter(i => !t.includes(i));
+    const rest = ITEM_POOL.filter((i) => !t.includes(i));
     const p = shuffle([...t, ...shuffle(rest).slice(0, POOL_SIZE - t.length)]);
 
     setTargets(t);
@@ -114,7 +124,7 @@ export default function ShoppingListRecall({ onBack }: { onBack: () => void }) {
     setHintUses(0);
     reactionTimes.current = [];
     order.current = [];
-    setPhase('memorize');
+    setPhase("memorize");
   }, [level]);
 
   /* --------- GAME LOGIC --------- */
@@ -122,7 +132,7 @@ export default function ShoppingListRecall({ onBack }: { onBack: () => void }) {
   const startRecall = () => {
     startTime.current = Date.now();
     lastClick.current = startTime.current;
-    setPhase('recall');
+    setPhase("recall");
   };
 
   const selectItem = (name: string) => {
@@ -131,14 +141,12 @@ export default function ShoppingListRecall({ onBack }: { onBack: () => void }) {
     reactionTimes.current.push(now - lastClick.current);
     lastClick.current = now;
     order.current.push(name);
-    setSelected(prev => [...prev, name]);
+    setSelected((prev) => [...prev, name]);
   };
 
   const useHint = () => {
     if (hintUses > 0) return;
-    const unselectedCorrect = targets.filter(
-      t => !selected.includes(t.name)
-    );
+    const unselectedCorrect = targets.filter((t) => !selected.includes(t.name));
     if (unselectedCorrect.length === 0) return;
 
     setHintItem(unselectedCorrect[0]);
@@ -149,14 +157,12 @@ export default function ShoppingListRecall({ onBack }: { onBack: () => void }) {
 
   const finishLevel = () => {
     const recallTime = Date.now() - startTime.current;
-    const correctItems = targets.map(t => t.name);
+    const correctItems = targets.map((t) => t.name);
 
-    const correctCount = selected.filter(s =>
-      correctItems.includes(s)
+    const correctCount = selected.filter((s) =>
+      correctItems.includes(s),
     ).length;
-    const wrongCount = selected.filter(
-      s => !correctItems.includes(s)
-    ).length;
+    const wrongCount = selected.filter((s) => !correctItems.includes(s)).length;
 
     setLastCorrect(correctCount);
     setLastWrong(wrongCount);
@@ -173,12 +179,12 @@ export default function ShoppingListRecall({ onBack }: { onBack: () => void }) {
       reactionTimes: reactionTimes.current,
     });
 
-    setPhase('result');
+    setPhase("result");
   };
 
   const nextLevel = () => {
-    if (level === 5) setPhase('final');
-    else setLevel(l => l + 1);
+    if (level === 5) setPhase("final");
+    else setLevel((l) => l + 1);
   };
 
   async function submitShoppingListResult() {
@@ -190,8 +196,10 @@ export default function ShoppingListRecall({ onBack }: { onBack: () => void }) {
     const levels = allMetrics.current.length;
 
     const avgAccuracy =
-      allMetrics.current.reduce((s, l) => s + l.correctCount / l.itemsShown.length, 0) /
-      levels;
+      allMetrics.current.reduce(
+        (s, l) => s + l.correctCount / l.itemsShown.length,
+        0,
+      ) / levels;
 
     const avgRecallTime =
       allMetrics.current.reduce((s, l) => s + l.recallTimeMs, 0) / levels;
@@ -199,7 +207,8 @@ export default function ShoppingListRecall({ onBack }: { onBack: () => void }) {
     const avgReactionTime =
       allMetrics.current.reduce((s, l) => {
         if (l.reactionTimes.length === 0) return s;
-        const avg = l.reactionTimes.reduce((a, b) => a + b, 0) / l.reactionTimes.length;
+        const avg =
+          l.reactionTimes.reduce((a, b) => a + b, 0) / l.reactionTimes.length;
         return s + avg;
       }, 0) / levels;
 
@@ -209,10 +218,10 @@ export default function ShoppingListRecall({ onBack }: { onBack: () => void }) {
     );
 
     const hintUsageRate =
-      allMetrics.current.filter(l => l.hintUses > 0).length / levels;
+      allMetrics.current.filter((l) => l.hintUses > 0).length / levels;
 
     try {
-      await fetch("http://192.168.1.4:4000/api/game", {
+      await fetch("https://cognito-sense-backend-4.onrender.com/api/game", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -241,13 +250,12 @@ export default function ShoppingListRecall({ onBack }: { onBack: () => void }) {
     }
   }, [phase]);
 
-
   /* ---------------- UI ---------------- */
 
   return (
     <ImageBackground
       source={{
-        uri: 'https://images.unsplash.com/photo-1587049352851-8d51c4f1f82b',
+        uri: "https://images.unsplash.com/photo-1587049352851-8d51c4f1f82b",
       }}
       style={styles.bg}
     >
@@ -259,11 +267,11 @@ export default function ShoppingListRecall({ onBack }: { onBack: () => void }) {
         <Text style={styles.title}>🛒 Shopping List Recall</Text>
         <Text style={styles.level}>Level {level} / 5</Text>
 
-        {phase === 'memorize' && (
+        {phase === "memorize" && (
           <>
             <Text style={styles.subtitle}>Memorize these items</Text>
             <View style={styles.grid}>
-              {targets.map(i => (
+              {targets.map((i) => (
                 <View key={i.name} style={styles.card}>
                   <Image source={getImageSource(i.img)} style={styles.img} />
                   <Text style={styles.label}>{i.name}</Text>
@@ -276,23 +284,23 @@ export default function ShoppingListRecall({ onBack }: { onBack: () => void }) {
           </>
         )}
 
-        {phase === 'recall' && (
+        {phase === "recall" && (
           <>
             <Text style={styles.subtitle}>Select remembered items</Text>
 
             {hintItem && (
               <View style={styles.hintBox}>
                 <Text style={styles.hintText}>Hint</Text>
-                <Image source={getImageSource(hintItem.img)} style={styles.img} />
+                <Image
+                  source={getImageSource(hintItem.img)}
+                  style={styles.img}
+                />
                 <Text style={styles.label}>{hintItem.name}</Text>
               </View>
             )}
 
             <TouchableOpacity
-              style={[
-                styles.hintBtn,
-                hintUses > 0 && { opacity: 0.4 },
-              ]}
+              style={[styles.hintBtn, hintUses > 0 && { opacity: 0.4 }]}
               onPress={useHint}
               disabled={hintUses > 0}
             >
@@ -302,7 +310,7 @@ export default function ShoppingListRecall({ onBack }: { onBack: () => void }) {
             <FlatList
               data={pool}
               numColumns={2}
-              keyExtractor={i => i.name}
+              keyExtractor={(i) => i.name}
               renderItem={({ item }) => (
                 <TouchableOpacity
                   style={[
@@ -323,29 +331,29 @@ export default function ShoppingListRecall({ onBack }: { onBack: () => void }) {
           </>
         )}
 
-        {phase === 'result' && (
-          <View style={{ alignItems: 'center', marginTop: 20 }}>
+        {phase === "result" && (
+          <View style={{ alignItems: "center", marginTop: 20 }}>
             <Text style={styles.subtitle}>
-              {lastWrong === 0 ? '✅ Excellent!' : '⚠️ Review Needed'}
+              {lastWrong === 0 ? "✅ Excellent!" : "⚠️ Review Needed"}
             </Text>
             <Text style={styles.resultText}>✔ Correct: {lastCorrect}</Text>
             <Text style={styles.resultText}>❌ Wrong: {lastWrong}</Text>
 
             <TouchableOpacity style={styles.btn} onPress={nextLevel}>
               <Text style={styles.btnText}>
-                {level === 5 ? 'Finish Game' : 'Next Level'}
+                {level === 5 ? "Finish Game" : "Next Level"}
               </Text>
             </TouchableOpacity>
           </View>
         )}
 
-        {phase === 'final' && (
-          <View style={{ alignItems: 'center', marginTop: 30 }}>
+        {phase === "final" && (
+          <View style={{ alignItems: "center", marginTop: 30 }}>
             <Confetti numberOfPieces={350} recycle={false} />
 
             <Image
               source={{
-                uri: 'https://cdn-icons-png.flaticon.com/512/2583/2583344.png',
+                uri: "https://cdn-icons-png.flaticon.com/512/2583/2583344.png",
               }}
               style={{ width: 120, height: 120, marginBottom: 20 }}
             />
@@ -370,49 +378,58 @@ export default function ShoppingListRecall({ onBack }: { onBack: () => void }) {
 const styles = StyleSheet.create({
   bg: { flex: 1 },
   container: { padding: 16 },
-  backText: { color: '#fff', marginBottom: 10 },
-  title: { fontSize: 26, fontWeight: '800', color: '#fff', textAlign: 'center' },
-  level: { textAlign: 'center', color: '#f5d7c6', marginBottom: 10 },
-  subtitle: { fontSize: 18, color: '#fff', marginVertical: 12 },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
+  backText: { color: "#fff", marginBottom: 10 },
+  title: {
+    fontSize: 26,
+    fontWeight: "800",
+    color: "#fff",
+    textAlign: "center",
+  },
+  level: { textAlign: "center", color: "#f5d7c6", marginBottom: 10 },
+  subtitle: { fontSize: 18, color: "#fff", marginVertical: 12 },
+  grid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+  },
   card: {
-    backgroundColor: '#5a1e1e',
+    backgroundColor: "#5a1e1e",
     borderRadius: 14,
     padding: 10,
-    width: '48%',
+    width: "48%",
     marginBottom: 12,
-    alignItems: 'center',
+    alignItems: "center",
   },
-  selected: { borderColor: '#f5d7c6', borderWidth: 2 },
+  selected: { borderColor: "#f5d7c6", borderWidth: 2 },
   img: { width: 70, height: 70, marginBottom: 6 },
-  label: { color: '#fff', fontWeight: '700' },
+  label: { color: "#fff", fontWeight: "700" },
   btn: {
-    backgroundColor: '#7b2c2c',
+    backgroundColor: "#7b2c2c",
     padding: 14,
     borderRadius: 12,
     marginTop: 16,
-    alignItems: 'center',
+    alignItems: "center",
   },
   hintBtn: {
-    backgroundColor: '#8c3b3b',
+    backgroundColor: "#8c3b3b",
     padding: 12,
     borderRadius: 10,
     marginBottom: 12,
-    alignItems: 'center',
+    alignItems: "center",
   },
-  btnText: { color: '#fff', fontWeight: '800' },
+  btnText: { color: "#fff", fontWeight: "800" },
   hintBox: {
-    backgroundColor: '#6b2626',
+    backgroundColor: "#6b2626",
     borderRadius: 12,
     padding: 10,
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 10,
   },
-  hintText: { color: '#ffd7b5', fontWeight: '800', marginBottom: 4 },
+  hintText: { color: "#ffd7b5", fontWeight: "800", marginBottom: 4 },
   resultText: {
-    color: '#f5d7c6',
+    color: "#f5d7c6",
     fontSize: 16,
     marginVertical: 4,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });

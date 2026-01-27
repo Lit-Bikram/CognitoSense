@@ -1,76 +1,140 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Background } from '../../components/Background';
-import { Button } from '../../components/Button';
-import { Card } from '../../components/Card';
-import { Input } from '../../components/Input';
-import { RadioButton } from '../../components/RadioButton';
-import { useLanguage } from '../../context/LanguageContext';
-import { useAuth } from '../../context/AuthContext';
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
+import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Background } from "../../components/Background";
+import { Button } from "../../components/Button";
+import { Card } from "../../components/Card";
+import { Input } from "../../components/Input";
+import { RadioButton } from "../../components/RadioButton";
+import { useAuth } from "../../context/AuthContext";
+import { useLanguage } from "../../context/LanguageContext";
 
-
-
-type SectionType = 'numeric' | 'yesno' | 'mixed';
+type SectionType = "numeric" | "yesno" | "mixed";
 
 const SECTIONS = {
   1: {
-    title: 'SECTION 1 — BASIC RISK FACTORS',
-    type: 'mixed' as SectionType,
+    title: "SECTION 1 — BASIC RISK FACTORS",
+    type: "mixed" as SectionType,
     fields: [
-      { key: 'name', label: 'What is your name?' },
-      { key: 'age', label: 'What is your age?' },
-      { key: 'sleep_hours', label: 'How many hours of sleep do you get per night on average?' },
-      { key: 'exercise_days', label: 'How many days per week do you exercise (at least 30 minutes)?' },
-      { key: 'family_dementia', label: 'How many close family members (parents/grandparents) had dementia?' },
-      { key: 'long_term_diseases', label: 'How many long-term diseases do you have? (e.g., diabetes, hypertension)' },
-      { key: 'medications_daily', label: 'How many medications do you take daily?' },
-      { key: 'forgotten_times', label: 'How many times in the last month have you forgotten appointments or tasks?' },
-      { key: 'falls_past_year', label: 'How many falls or balance-related incidents have you had in the past year?' },
+      { key: "name", label: "What is your name?" },
+      { key: "age", label: "What is your age?" },
+      {
+        key: "sleep_hours",
+        label: "How many hours of sleep do you get per night on average?",
+      },
+      {
+        key: "exercise_days",
+        label: "How many days per week do you exercise (at least 30 minutes)?",
+      },
+      {
+        key: "family_dementia",
+        label:
+          "How many close family members (parents/grandparents) had dementia?",
+      },
+      {
+        key: "long_term_diseases",
+        label:
+          "How many long-term diseases do you have? (e.g., diabetes, hypertension)",
+      },
+      {
+        key: "medications_daily",
+        label: "How many medications do you take daily?",
+      },
+      {
+        key: "forgotten_times",
+        label:
+          "How many times in the last month have you forgotten appointments or tasks?",
+      },
+      {
+        key: "falls_past_year",
+        label:
+          "How many falls or balance-related incidents have you had in the past year?",
+      },
     ],
   },
   2: {
-    title: 'SECTION 2 — LIFESTYLE & HEALTH RISKS',
-    type: 'yesno' as SectionType,
+    title: "SECTION 2 — LIFESTYLE & HEALTH RISKS",
+    type: "yesno" as SectionType,
     fields: [
-      { key: 'smoke', label: 'Do you smoke?' },
-      { key: 'drink', label: 'Do you drink alcohol regularly (at least once per week)?' },
-      { key: 'diabetes', label: 'Do you have diabetes?' },
-      { key: 'high_bp', label: 'Do you have high blood pressure?' },
-      { key: 'high_cholesterol', label: 'Do you have high cholesterol?' },
-      { key: 'history_stroke', label: 'Do you have a history of stroke?' },
+      { key: "smoke", label: "Do you smoke?" },
+      {
+        key: "drink",
+        label: "Do you drink alcohol regularly (at least once per week)?",
+      },
+      { key: "diabetes", label: "Do you have diabetes?" },
+      { key: "high_bp", label: "Do you have high blood pressure?" },
+      { key: "high_cholesterol", label: "Do you have high cholesterol?" },
+      { key: "history_stroke", label: "Do you have a history of stroke?" },
     ],
   },
   3: {
-    title: 'SECTION 3 — COGNITIVE EARLY SIGNS',
-    type: 'yesno' as SectionType,
+    title: "SECTION 3 — COGNITIVE EARLY SIGNS",
+    type: "yesno" as SectionType,
     fields: [
-      { key: 'forget_recent', label: 'Do you often forget recent conversations or events?' },
-      { key: 'misplace_objects', label: 'Do you frequently misplace objects (keys, phone, wallet)?' },
-      { key: 'confused_dates', label: 'Do you get confused about dates or time of day?' },
-      { key: 'trouble_instructions', label: 'Do you have trouble following instructions or familiar tasks (e.g., cooking)?' },
-      { key: 'difficult_concentrate', label: 'Do you find it difficult to concentrate for long periods?' },
-      { key: 'word_finding', label: 'Do you struggle to find the right words while speaking?' },
-      { key: 'get_lost', label: 'Do you get lost in familiar places?' },
+      {
+        key: "forget_recent",
+        label: "Do you often forget recent conversations or events?",
+      },
+      {
+        key: "misplace_objects",
+        label: "Do you frequently misplace objects (keys, phone, wallet)?",
+      },
+      {
+        key: "confused_dates",
+        label: "Do you get confused about dates or time of day?",
+      },
+      {
+        key: "trouble_instructions",
+        label:
+          "Do you have trouble following instructions or familiar tasks (e.g., cooking)?",
+      },
+      {
+        key: "difficult_concentrate",
+        label: "Do you find it difficult to concentrate for long periods?",
+      },
+      {
+        key: "word_finding",
+        label: "Do you struggle to find the right words while speaking?",
+      },
+      { key: "get_lost", label: "Do you get lost in familiar places?" },
     ],
   },
   4: {
-    title: 'SECTION 4 — BEHAVIOURAL / MOOD CHANGES',
-    type: 'yesno' as SectionType,
+    title: "SECTION 4 — BEHAVIOURAL / MOOD CHANGES",
+    type: "yesno" as SectionType,
     fields: [
-      { key: 'mood_changes', label: 'Have you experienced sudden mood changes recently?' },
-      { key: 'feel_irritable', label: 'Have you felt unusually irritable, confused, or anxious?' },
-      { key: 'others_noticed_change', label: 'Have others noticed a change in your personality or behaviour?' },
+      {
+        key: "mood_changes",
+        label: "Have you experienced sudden mood changes recently?",
+      },
+      {
+        key: "feel_irritable",
+        label: "Have you felt unusually irritable, confused, or anxious?",
+      },
+      {
+        key: "others_noticed_change",
+        label: "Have others noticed a change in your personality or behaviour?",
+      },
     ],
   },
   5: {
-    title: 'SECTION 5 — DAILY FUNCTIONAL ABILITY',
-    type: 'yesno' as SectionType,
+    title: "SECTION 5 — DAILY FUNCTIONAL ABILITY",
+    type: "yesno" as SectionType,
 
     fields: [
-      { key: 'need_help_daily', label: 'Do you need help with daily tasks (shopping, bills, medicines)?' },
-      { key: 'forget_meals_meds', label: 'Do you forget to eat meals or take medicine on time?' },
-      { key: 'struggle_money', label: 'Do you struggle to manage money or simple calculations?' },
+      {
+        key: "need_help_daily",
+        label:
+          "Do you need help with daily tasks (shopping, bills, medicines)?",
+      },
+      {
+        key: "forget_meals_meds",
+        label: "Do you forget to eat meals or take medicine on time?",
+      },
+      {
+        key: "struggle_money",
+        label: "Do you struggle to manage money or simple calculations?",
+      },
     ],
   },
 };
@@ -87,17 +151,17 @@ export default function QuestionnaireScreen() {
   const { username, isAuthenticated } = useAuth();
   const currentSection = SECTIONS[sectionNum as keyof typeof SECTIONS];
   const progress = ((sectionNum - 1) / 4) * 100;
-  
+
   useEffect(() => {
     const sectionAnswers: Record<string, any> = {};
-    currentSection.fields.forEach(field => {
+    currentSection.fields.forEach((field) => {
       if (globalAnswers[field.key] !== undefined) {
         sectionAnswers[field.key] = globalAnswers[field.key];
       }
     });
     setAnswers(sectionAnswers);
   }, [sectionNum, currentSection.fields]);
-  
+
   const isValidName = (name: string) => {
     // Only alphabets and spaces allowed
     return /^[A-Za-z\s]+$/.test(name.trim());
@@ -118,7 +182,10 @@ export default function QuestionnaireScreen() {
       }
 
       // ✅ Numeric fields
-      if (currentSection.type === "numeric" || currentSection.type === "mixed") {
+      if (
+        currentSection.type === "numeric" ||
+        currentSection.type === "mixed"
+      ) {
         if (answer === undefined || answer === "") {
           return `Please fill the field: ${field.label}`;
         }
@@ -146,7 +213,7 @@ export default function QuestionnaireScreen() {
     }
 
     // ✅ Save answers globally
-    Object.keys(answers).forEach(key => {
+    Object.keys(answers).forEach((key) => {
       globalAnswers[key] = answers[key];
     });
 
@@ -158,7 +225,10 @@ export default function QuestionnaireScreen() {
 
     // ✅ Last section logic
     if (!isAuthenticated || !username) {
-      Alert.alert("Not logged in", "Please log in before submitting the questionnaire.");
+      Alert.alert(
+        "Not logged in",
+        "Please log in before submitting the questionnaire.",
+      );
       return;
     }
 
@@ -176,18 +246,25 @@ export default function QuestionnaireScreen() {
         questionnaireResponse,
         totalScore: score,
         targetClass:
-          category === "risk_low" ? 0 :
-          category === "risk_moderate" ? 1 :
-          category === "risk_high" ? 2 : 3,
+          category === "risk_low"
+            ? 0
+            : category === "risk_moderate"
+              ? 1
+              : category === "risk_high"
+                ? 2
+                : 3,
       };
 
       console.log("📤 Sending questionnaire payload:", payload);
 
-      const res = await fetch("http://192.168.1.4:4000/api/questionnaire", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      const res = await fetch(
+        "https://cognito-sense-backend-4.onrender.com/api/questionnaire",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        },
+      );
 
       if (!res.ok) throw new Error("API failed");
 
@@ -197,7 +274,6 @@ export default function QuestionnaireScreen() {
         pathname: "/result",
         params: { score: score.toString(), category },
       });
-
     } catch (err) {
       console.error("❌ Questionnaire submit failed:", err);
       Alert.alert("Error", "Failed to submit questionnaire. Check backend.");
@@ -206,19 +282,15 @@ export default function QuestionnaireScreen() {
     }
   };
 
-
-
-
-
   const handleBack = () => {
-    Object.keys(answers).forEach(key => {
+    Object.keys(answers).forEach((key) => {
       globalAnswers[key] = answers[key];
     });
     router.back();
   };
 
   const updateAnswer = (key: string, value: any) => {
-    setAnswers(prev => ({ ...prev, [key]: value }));
+    setAnswers((prev) => ({ ...prev, [key]: value }));
   };
 
   return (
@@ -227,7 +299,7 @@ export default function QuestionnaireScreen() {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Card>
           <View style={styles.header}>
-            <Text style={styles.title}>{t('title')}</Text>
+            <Text style={styles.title}>{t("title")}</Text>
             <Text style={styles.sectionNumber}>Section {sectionNum} of 5</Text>
           </View>
 
@@ -238,33 +310,38 @@ export default function QuestionnaireScreen() {
 
             <Text style={styles.sectionTitle}>{currentSection.title}</Text>
 
-            {currentSection.type === 'numeric' || currentSection.type === 'mixed'
-            ? currentSection.fields.map((field) => (
-                <Input
-                  key={field.key}
-                  label={field.label}
-                  value={answers[field.key]?.toString() || ''}
-                  onChangeText={(val) => updateAnswer(field.key, val)}
-                  keyboardType={field.key === 'name' ? 'default' : 'numeric'} // ✅ FIX
-                  placeholder={field.key === 'name' ? 'Enter your name' : '0'}
-                />
-              ))
-            : currentSection.fields.map((field) => (
-                <RadioButton
-                  key={field.key}
-                  label={field.label}
-                  value={answers[field.key]}
-                  onChange={(val) => updateAnswer(field.key, val)}
-                />
-              ))}
-
+            {currentSection.type === "numeric" ||
+            currentSection.type === "mixed"
+              ? currentSection.fields.map((field) => (
+                  <Input
+                    key={field.key}
+                    label={field.label}
+                    value={answers[field.key]?.toString() || ""}
+                    onChangeText={(val) => updateAnswer(field.key, val)}
+                    keyboardType={field.key === "name" ? "default" : "numeric"} // ✅ FIX
+                    placeholder={field.key === "name" ? "Enter your name" : "0"}
+                  />
+                ))
+              : currentSection.fields.map((field) => (
+                  <RadioButton
+                    key={field.key}
+                    label={field.label}
+                    value={answers[field.key]}
+                    onChange={(val) => updateAnswer(field.key, val)}
+                  />
+                ))}
 
             <View style={styles.buttons}>
               {sectionNum > 1 && (
-                <Button title={t('back')} onPress={handleBack} style={{ flex: 1 }} muted />
+                <Button
+                  title={t("back")}
+                  onPress={handleBack}
+                  style={{ flex: 1 }}
+                  muted
+                />
               )}
               <Button
-                title={sectionNum === 5 ? t('submit') : t('next')}
+                title={sectionNum === 5 ? t("submit") : t("next")}
                 onPress={handleNext}
                 // onPress={() => {
                 //   console.log("SUBMIT BUTTON PRESSED");
@@ -338,23 +415,41 @@ function calculateRiskScore(answers: Record<string, any>): number {
   if (sleepHours < 6) raw += 10;
   else if (sleepHours < 7) raw += 5;
 
-  const exerciseDays = Math.min(7, Math.max(0, parseInt(answers.exercise_days) || 0));
+  const exerciseDays = Math.min(
+    7,
+    Math.max(0, parseInt(answers.exercise_days) || 0),
+  );
   if (exerciseDays < 2) raw += 10;
   else if (exerciseDays < 4) raw += 5;
 
-  const familyDementia = Math.min(2, Math.max(0, parseInt(answers.family_dementia) || 0));
+  const familyDementia = Math.min(
+    2,
+    Math.max(0, parseInt(answers.family_dementia) || 0),
+  );
   raw += familyDementia * 8;
 
-  const longTermDiseases = Math.min(3, Math.max(0, parseInt(answers.long_term_diseases) || 0));
+  const longTermDiseases = Math.min(
+    3,
+    Math.max(0, parseInt(answers.long_term_diseases) || 0),
+  );
   raw += longTermDiseases * 5;
 
-  const medicationsDaily = Math.min(10, Math.max(0, parseInt(answers.medications_daily) || 0));
+  const medicationsDaily = Math.min(
+    10,
+    Math.max(0, parseInt(answers.medications_daily) || 0),
+  );
   raw += medicationsDaily * 3;
 
-  const forgottenTimes = Math.min(10, Math.max(0, parseInt(answers.forgotten_times) || 0));
+  const forgottenTimes = Math.min(
+    10,
+    Math.max(0, parseInt(answers.forgotten_times) || 0),
+  );
   raw += forgottenTimes * 2;
 
-  const fallsPastYear = Math.min(5, Math.max(0, parseInt(answers.falls_past_year) || 0));
+  const fallsPastYear = Math.min(
+    5,
+    Math.max(0, parseInt(answers.falls_past_year) || 0),
+  );
   raw += fallsPastYear * 4;
 
   // Section 2: Lifestyle & Health Risks
@@ -407,16 +502,16 @@ function calculateRiskScore(answers: Record<string, any>): number {
 }
 
 function getRiskCategory(score: number): string {
-  if (score < 25) return 'risk_low';
-  if (score < 50) return 'risk_moderate';
-  if (score < 75) return 'risk_high';
-  return 'risk_very_high';
+  if (score < 25) return "risk_low";
+  if (score < 50) return "risk_moderate";
+  if (score < 75) return "risk_high";
+  return "risk_very_high";
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",      // ✅ center horizontally
+    alignItems: "center", // ✅ center horizontally
     justifyContent: "center",
   },
   scrollContent: {
@@ -424,7 +519,7 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingBottom: 40,
     width: "100%",
-    maxWidth: 650,          // ✅ controls card width
+    maxWidth: 650, // ✅ controls card width
     alignSelf: "center",
   },
   header: {
@@ -433,14 +528,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    color: '#0f172a',
-    fontWeight: '700',
+    color: "#0f172a",
+    fontWeight: "700",
   },
   sectionNumber: {
     fontSize: 12,
-    color: '#6b7280',
+    color: "#6b7280",
     marginTop: 4,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   body: {
     padding: 32,
@@ -448,26 +543,26 @@ const styles = StyleSheet.create({
   },
   progressWrap: {
     height: 8,
-    backgroundColor: 'rgba(11, 17, 32, 0.06)',
+    backgroundColor: "rgba(11, 17, 32, 0.06)",
     borderRadius: 999,
     marginBottom: 16,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   progress: {
-    height: '100%',
-    backgroundColor: '#06b6d4',
+    height: "100%",
+    backgroundColor: "#06b6d4",
     borderRadius: 999,
   },
   sectionTitle: {
     fontSize: 15,
-    fontWeight: '700',
-    color: '#0f172a',
+    fontWeight: "700",
+    color: "#0f172a",
     marginBottom: 20,
     marginTop: 4,
     lineHeight: 22,
   },
   buttons: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 12,
     marginTop: 24,
   },
