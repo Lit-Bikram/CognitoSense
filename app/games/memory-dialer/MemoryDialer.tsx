@@ -155,7 +155,7 @@ export default function MemoryDialer({ onBack }: Props) {
       logs.filter((l) => l.ErrorPattern !== "None").length / levelsCompleted;
 
     try {
-      await fetch("https://cognito-sense-backend-4.onrender.com/api/game", {
+      await fetch("http://192.168.1.8:4000/api/game", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

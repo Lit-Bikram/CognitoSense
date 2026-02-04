@@ -27,23 +27,6 @@ export default function AccessScreen() {
           </Text>
         </View>
 
-        {/* Eye Tracking Card */}
-        <Card style={styles.card}>
-          <View style={styles.cardContent}>
-            <View style={styles.iconContainer}>
-              <Text style={styles.icon}>👁️</Text>
-            </View>
-            <Text style={styles.cardTitle}>{t('eye_track')}</Text>
-            <Text style={styles.cardDescription}>
-              Advanced eye tracking analysis to detect cognitive patterns and early signs of dementia
-            </Text>
-            <Button
-              title="Start Eye Test"
-              onPress={() => router.push('/eye-test')}
-              style={styles.cardButton}
-            />
-          </View>
-        </Card>
 
         {/* Cognitive Games Card */}
         <Card style={styles.card}>
@@ -63,6 +46,24 @@ export default function AccessScreen() {
           </View>
         </Card>
 
+        {/* Eye Tracking Card */}
+        <Card style={styles.card}>
+          <View style={styles.cardContent}>
+            <View style={styles.iconContainer}>
+              <Text style={styles.icon}>👁️</Text>
+            </View>
+            <Text style={styles.cardTitle}>{t('eye_track')}</Text>
+            <Text style={styles.cardDescription}>
+              Advanced eye tracking analysis to detect cognitive patterns and early signs of dementia
+            </Text>
+            <Button
+              title="Start Eye Test"
+              onPress={() => router.push('/eye-test')}
+              style={styles.cardButton}
+            />
+          </View>
+        </Card>
+        
         {/* Retake Assessment Card */}
         <Card style={styles.card}>
           <View style={styles.cardContent}>

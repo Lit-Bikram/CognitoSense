@@ -126,7 +126,7 @@ export default function MoneyManager({ onBack }: { onBack?: () => void } = {}) {
     const overBudgetCount = logs.filter((l) => l.overBudget).length;
 
     try {
-      await fetch("https://cognito-sense-backend-4.onrender.com/api/game", {
+      await fetch("http://192.168.1.8:4000/api/game", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
