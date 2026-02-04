@@ -23,7 +23,7 @@
     <style>
       body {
         font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        background-color: #1a1a1a;
+        background: linear-gradient(135deg, #0f172a, #020617);
         color: white;
         display: flex;
         flex-direction: column;
@@ -35,12 +35,15 @@
 
       #experiment-container {
         position: relative;
-        width: 800px;
-        height: 600px;
+        width: 95vw; /* use almost full screen width */
+        height: 70vh; /* take most of the height */
+        max-width: 900px; /* don’t get too large on desktop */
+        max-height: 650px;
         background: #000;
-        border: 3px solid #444;
-        margin-top: 10px;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+        border-radius: 16px;
+        border: 2px solid rgba(0, 210, 255, 0.4);
+        margin: 10px auto;
+        box-shadow: 0 0 20px rgba(0, 210, 255, 0.2);
         overflow: hidden;
       }
 
@@ -56,6 +59,7 @@
         height: 100%;
         opacity: 0.4;
         transform: scaleX(-1);
+        object-fit: cover;
       }
 
       #ui-layer {
@@ -131,31 +135,59 @@
       }
 
       #status-panel {
-        margin-top: 10px;
+        width: 90%;
+        max-width: 600px;
+        margin: 10px auto;
         text-align: center;
-        z-index: 10;
+        background: rgba(255, 255, 255, 0.08);
+        padding: 12px;
+        border-radius: 12px;
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.15);
       }
 
       button {
-        padding: 10px 20px;
-        font-size: 16px;
+        padding: 12px 26px;
+        font-size: 17px;
         cursor: pointer;
-        background: #007bff;
+        background: linear-gradient(135deg, #2563eb, #3b82f6);
         color: white;
         border: none;
-        border-radius: 5px;
-        margin: 5px;
-        transition: background 0.2s;
+        border-radius: 10px;
+        margin: 8px;
+        box-shadow: 0 6px 15px rgba(59, 130, 246, 0.4);
+        transition:
+          transform 0.15s ease,
+          box-shadow 0.15s ease;
       }
+
       button:hover {
-        background: #0056b3;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(59, 130, 246, 0.5);
       }
+
       button:disabled {
         background: #555;
         cursor: not-allowed;
+        box-shadow: none;
       }
 
-      #results-overlay,
+      #results-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.95);
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 20;
+        overflow-y: auto;
+        padding-bottom: 80px;
+      }
+
       #verification-overlay {
         position: absolute;
         top: 0;
@@ -244,7 +276,36 @@
     </style>
   </head>
   <body>
-    <h1>CognitoSense: Saccade Experiment</h1>
+    <h1
+      style="
+        margin-top: 10px;
+        font-size: clamp(20px, 4vw, 32px);
+        text-align: center;
+        text-shadow: 0 0 8px rgba(0, 210, 255, 0.4);
+      "
+    >
+      👁️ CognitoSense: Saccade Experiment
+    </h1>
+    <button
+      id="back-btn"
+      onclick="goBack()"
+      style="
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        padding: 8px 14px;
+        font-size: 14px;
+        background: rgba(255, 255, 255, 0.12);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 10px;
+        backdrop-filter: blur(8px);
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      "
+    >
+      ← Back
+    </button>
 
     <div id="status-panel">
       <p>
@@ -261,6 +322,16 @@
         Start Calibration
       </button>
     </div>
+    <div
+      style="
+        position: absolute;
+        inset: 0;
+        border-radius: 18px;
+        border: 2px solid rgba(0, 210, 255, 0.25);
+        pointer-events: none;
+        z-index: 2;
+      "
+    ></div>
 
     <div id="experiment-container">
       <video id="input_video"></video>
@@ -325,7 +396,16 @@
           </thead>
           <tbody></tbody>
         </table>
-        <div>
+        <div
+          style="
+            position: sticky;
+            bottom: 20px;
+            margin-top: 20px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 10px;
+            border-radius: 10px;
+          "
+        >
           <button onclick="sendResultsToAPI()">Send Results</button>
           <button onclick="restartExperiment()">Restart</button>
         </div>
@@ -677,30 +757,18 @@
         instructionText.innerText = "";
         startBtn.disabled = false;
 
-        // HIDE THE GAZING THINGS
+        // Hide camera view
         canvasElement.style.display = "none";
         glowLeft.style.opacity = "0";
         glowRight.style.opacity = "0";
 
-        resultsTableBody.innerHTML = "";
+        // ❌ DO NOT SHOW RESULTS UI
+        resultsOverlay.style.display = "none";
 
-        experimentResults.forEach((row) => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-                <td>${row.trial}</td>
-                <td>${row.task}</td>
-                <td>${row.target}</td>
-                <td>${row.response}</td>
-                <td>${row.rt}</td>
-                <td class="${row.correct ? "correct" : "wrong"}">
-                    ${row.correct ? "✓" : "✗"}
-                </td>
-            `;
-          resultsTableBody.appendChild(tr);
-        });
-
-        resultsOverlay.style.display = "flex";
+        // ✅ Automatically send results instead
+        sendResultsToAPI();
       }
+
       function computeMetrics() {
         const totalTrials = experimentResults.length;
         const correctTrials = experimentResults.filter((r) => r.correct).length;
@@ -792,14 +860,17 @@
         onFrame: async () => {
           await faceMesh.send({ image: videoElement });
         },
-        width: 800,
-        height: 600,
+        width: 480,
+        height: 640,
       });
 
       camera.start().then(() => {
         statusText.innerText = "System Ready. Please Sit Still.";
         startBtn.disabled = false;
       });
+      function goBack() {
+        window.history.back();
+      }
     </script>
   </body>
 </html>
