@@ -271,7 +271,7 @@ export default function QuestionnaireScreen() {
       console.log("📤 Sending questionnaire payload:", payload);
 
       const res = await fetch(
-        "http://192.168.1.8:4000/api/questionnaire",
+        "https://cognito-sense-backend-4.onrender.com/api/questionnaire",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

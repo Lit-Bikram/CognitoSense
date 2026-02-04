@@ -840,7 +840,7 @@
 
         try {
           const response = await fetch(
-            "http://192.168.1.8:4000/api/eye-tracking",
+            "https://cognito-sense-backend-4.onrender.com/api/eye-tracking",
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -851,7 +851,7 @@
           const result = await response.json();
           console.log("✅ Backend response:", result);
           alert("✅ Eye tracking saved!");
-          stopCamera();   // ✅ NEW LINE
+          stopCamera(); // ✅ NEW LINE
         } catch (err) {
           console.error("❌ API error:", err);
           alert("❌ Failed to send data");

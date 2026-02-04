@@ -221,7 +221,7 @@ export default function ShoppingListRecall({ onBack }: { onBack: () => void }) {
       allMetrics.current.filter((l) => l.hintUses > 0).length / levels;
 
     try {
-      await fetch("http://192.168.1.8:4000/api/game", {
+      await fetch("https://cognito-sense-backend-4.onrender.com/api/game", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

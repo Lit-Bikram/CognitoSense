@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import Confetti from "react-confetti";
 import {
-  ImageBackground,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    ImageBackground,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { useAuth } from "../../../context/AuthContext";
 
@@ -155,7 +155,7 @@ export default function MemoryDialer({ onBack }: Props) {
       logs.filter((l) => l.ErrorPattern !== "None").length / levelsCompleted;
 
     try {
-      await fetch("http://192.168.1.8:4000/api/game", {
+      await fetch("https://cognito-sense-backend-4.onrender.com/api/game", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
