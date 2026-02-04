@@ -797,8 +797,9 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
               style={{
                 display: "flex",
                 justifyContent: "space-around",
-                marginBottom: "80px",
-                gap: "20px",
+                marginBottom: "30px", // <-- reduced from 80px
+                gap: "15px",
+                flexWrap: "wrap",
               }}
             >
               {COLORS.map((color) => (
@@ -808,8 +809,8 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
                     zoneRefs.current[color] = el;
                   }}
                   style={{
-                    width: "200px",
-                    height: "180px",
+                    width: "clamp(100px, 14vw, 160px)",
+                    height: "clamp(90px, 12vw, 130px)",
                     backgroundColor: COLOR_MAP[color],
                     borderRadius: "25px",
                     display: "flex",
@@ -841,8 +842,9 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
                 onMouseDown={handleMouseDown}
                 onTouchStart={handleMouseDown}
                 style={{
-                  width: "140px",
-                  height: "140px",
+                  width: "clamp(90px, 12vw, 120px)",
+                  height: "clamp(90px, 12vw, 120px)",
+                  marginTop: "-10px",
                   background:
                     "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
                   borderRadius: "25px",
@@ -850,7 +852,7 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
                   flexDirection: "column",
                   alignItems: "center",
                   justifyContent: "center",
-                  margin: "0 auto",
+                  margin: "10px auto 0 auto",
                   cursor: isDragging ? "grabbing" : "grab",
                   boxShadow: "0 15px 40px rgba(0,0,0,0.5)",
                   position: "relative",

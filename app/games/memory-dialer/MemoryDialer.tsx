@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import Confetti from "react-confetti";
 import {
-    ImageBackground,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ImageBackground,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { useAuth } from "../../../context/AuthContext";
 

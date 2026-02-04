@@ -375,7 +375,10 @@
       const RIGHT_EYE = { outer: 263, inner: 362, iris: 473 };
 
       // Experiment State
-      const MAX_TRIALS = 4;
+      const PRO_TRIALS = 5; // number of PRO trials
+      const ANTI_TRIALS = 5; // number of ANTI trials
+      const MAX_TRIALS = PRO_TRIALS + ANTI_TRIALS;
+
       let currentTrialIndex = 0;
       let experimentResults = [];
       let isRunning = false;
@@ -593,8 +596,7 @@
         gazeHistory = [];
         glowLeft.style.opacity = "0";
         glowRight.style.opacity = "0";
-
-        if (currentTrialIndex < 2) {
+        if (currentTrialIndex < PRO_TRIALS) {
           currentTask = "PRO";
           instructionText.innerText = `Task: LOOK AT DOT`;
           instructionText.style.color = "#4caf50";
