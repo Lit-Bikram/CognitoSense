@@ -324,7 +324,8 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
-          padding: "20px",
+          padding: "20px 20px 40px 20px", // 👈 extra bottom space
+
           fontFamily: "system-ui, -apple-system, sans-serif",
           position: "relative",
         }}
@@ -339,7 +340,7 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
               top: "20px",
               left: "20px",
               padding: "12px 24px",
-              fontSize: "18px",
+              fontSize: "14px",
               fontWeight: "bold",
               color: "white",
               background: "rgba(0, 0, 0, 0.4)",
@@ -371,7 +372,7 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
             <div style={{ fontSize: "100px", marginBottom: "15px" }}>🎉</div>
             <h2
               style={{
-                fontSize: "48px",
+                fontSize: "32px",
                 margin: "0",
                 background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                 WebkitBackgroundClip: "text",
@@ -383,7 +384,7 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
             </h2>
             <p
               style={{
-                fontSize: "18px",
+                fontSize: "14px",
                 color: "#666",
                 marginTop: "10px",
                 fontWeight: "600",
@@ -393,20 +394,23 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
             </p>
           </div>
 
-          {/* Stats Grid */}
+          {/* RESPONSIVE STATS GRID */}
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: "25px",
-              marginBottom: "40px",
+              gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+              gap: "16px",
+              marginBottom: "30px",
+              maxWidth: "600px",
+              marginLeft: "auto",
+              marginRight: "auto",
             }}
           >
             {/* Correct */}
             <div
               style={{
                 background: "linear-gradient(135deg, #2ecc71 0%, #27ae60 100%)",
-                padding: "30px",
+                padding: "18px 16px",
                 borderRadius: "20px",
                 textAlign: "center",
                 boxShadow: "0 10px 30px rgba(46,204,113,0.4)",
@@ -414,10 +418,10 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
                 transition: "transform 0.3s",
               }}
             >
-              <div style={{ fontSize: "50px", marginBottom: "10px" }}>✅</div>
+              <div style={{ fontSize: "36px", marginBottom: "10px" }}>✅</div>
               <div
                 style={{
-                  fontSize: "48px",
+                  fontSize: "32px",
                   fontWeight: "900",
                   color: "white",
                   marginBottom: "5px",
@@ -427,7 +431,7 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
               </div>
               <div
                 style={{
-                  fontSize: "18px",
+                  fontSize: "14px",
                   color: "rgba(255,255,255,0.95)",
                   fontWeight: "700",
                   textTransform: "uppercase",
@@ -442,16 +446,16 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
             <div
               style={{
                 background: "linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)",
-                padding: "30px",
+                padding: "18px 16px",
                 borderRadius: "20px",
                 textAlign: "center",
                 boxShadow: "0 10px 30px rgba(231,76,60,0.4)",
               }}
             >
-              <div style={{ fontSize: "50px", marginBottom: "10px" }}>❌</div>
+              <div style={{ fontSize: "36px", marginBottom: "10px" }}>❌</div>
               <div
                 style={{
-                  fontSize: "48px",
+                  fontSize: "32px",
                   fontWeight: "900",
                   color: "white",
                   marginBottom: "5px",
@@ -461,7 +465,7 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
               </div>
               <div
                 style={{
-                  fontSize: "18px",
+                  fontSize: "14px",
                   color: "rgba(255,255,255,0.95)",
                   fontWeight: "700",
                   textTransform: "uppercase",
@@ -476,16 +480,16 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
             <div
               style={{
                 background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                padding: "30px",
+                padding: "18px 16px",
                 borderRadius: "20px",
                 textAlign: "center",
                 boxShadow: "0 10px 30px rgba(102,126,234,0.4)",
               }}
             >
-              <div style={{ fontSize: "50px", marginBottom: "10px" }}>🎯</div>
+              <div style={{ fontSize: "36px", marginBottom: "10px" }}>🎯</div>
               <div
                 style={{
-                  fontSize: "48px",
+                  fontSize: "32px",
                   fontWeight: "900",
                   color: "white",
                   marginBottom: "5px",
@@ -495,7 +499,7 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
               </div>
               <div
                 style={{
-                  fontSize: "18px",
+                  fontSize: "14px",
                   color: "rgba(255,255,255,0.95)",
                   fontWeight: "700",
                   textTransform: "uppercase",
@@ -510,16 +514,16 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
             <div
               style={{
                 background: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
-                padding: "30px",
+                padding: "18px 16px",
                 borderRadius: "20px",
                 textAlign: "center",
                 boxShadow: "0 10px 30px rgba(240,147,251,0.4)",
               }}
             >
-              <div style={{ fontSize: "50px", marginBottom: "10px" }}>⚡</div>
+              <div style={{ fontSize: "36px", marginBottom: "10px" }}>⚡</div>
               <div
                 style={{
-                  fontSize: "48px",
+                  fontSize: "32px",
                   fontWeight: "900",
                   color: "white",
                   marginBottom: "5px",
@@ -529,7 +533,7 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
               </div>
               <div
                 style={{
-                  fontSize: "18px",
+                  fontSize: "14px",
                   color: "rgba(255,255,255,0.95)",
                   fontWeight: "700",
                   textTransform: "uppercase",
@@ -620,7 +624,8 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundBlendMode: "multiply",
-        padding: "20px",
+        padding: "20px 20px 40px 20px", // 👈 extra bottom space
+
         fontFamily: "system-ui, -apple-system, sans-serif",
         userSelect: "none",
         touchAction: "none",
@@ -635,7 +640,7 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
             top: "20px",
             left: "20px",
             padding: "12px 24px",
-            fontSize: "18px",
+            fontSize: "14px",
             fontWeight: "bold",
             color: "white",
             background: "rgba(0, 0, 0, 0.4)",
@@ -657,7 +662,7 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
         <div style={{ textAlign: "center", marginBottom: "20px" }}>
           <h1
             style={{
-              fontSize: "48px",
+              fontSize: "32px",
               color: "white",
               margin: "0 0 10px 0",
               textShadow: "3px 3px 6px rgba(0,0,0,0.4)",
@@ -698,20 +703,24 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
             <div
               style={{
                 background: "rgba(255,255,255,0.25)",
-                borderRadius: "20px",
-                padding: "20px",
-                marginBottom: "25px",
+                borderRadius: "16px",
+                padding: "12px 14px", // reduced padding
+                marginBottom: "15px", // reduced space below
                 backdropFilter: "blur(10px)",
-                border: "3px solid rgba(255,255,255,0.4)",
-                boxShadow: "0 8px 20px rgba(0,0,0,0.2)",
+                border: "2px solid rgba(255,255,255,0.35)",
+                boxShadow: "0 6px 15px rgba(0,0,0,0.2)",
+                maxWidth: "650px",
+                marginLeft: "auto",
+                marginRight: "auto",
               }}
             >
               <p
                 style={{
                   color: "white",
-                  fontSize: "22px",
-                  fontWeight: "900",
+                  fontSize: "14px", // smaller
+                  fontWeight: "800",
                   textAlign: "center",
+                  margin: "4px 0",
                 }}
               >
                 Level {level} / 5 • Match by{" "}
@@ -722,9 +731,10 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
                 style={{
                   color: "white",
                   textAlign: "center",
-                  lineHeight: "1.8",
-                  fontSize: "18px",
+                  lineHeight: "1.4", // tighter spacing
+                  fontSize: "15px", // smaller text
                   fontWeight: "600",
+                  marginTop: "6px",
                 }}
               >
                 {rule === "WORD" ? (
@@ -744,7 +754,7 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
               </p>
             </div>
 
-            {/* SCORE */}
+            {/* SCORE
             <div
               style={{
                 display: "flex",
@@ -790,16 +800,18 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
                   ❌ {wrong}
                 </span>
               </div>
-            </div>
+            </div> */}
 
             {/* DROP ZONES */}
             <div
               style={{
-                display: "flex",
-                justifyContent: "space-around",
-                marginBottom: "30px", // <-- reduced from 80px
-                gap: "15px",
-                flexWrap: "wrap",
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
+                gap: "12px",
+                marginBottom: "10px",
+                maxWidth: "500px",
+                marginLeft: "auto",
+                marginRight: "auto",
               }}
             >
               {COLORS.map((color) => (
@@ -809,8 +821,9 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
                     zoneRefs.current[color] = el;
                   }}
                   style={{
-                    width: "clamp(100px, 14vw, 160px)",
-                    height: "clamp(90px, 12vw, 130px)",
+                    width: "100%",
+                    height: "clamp(80px, 14vh, 120px)",
+
                     backgroundColor: COLOR_MAP[color],
                     borderRadius: "25px",
                     display: "flex",
@@ -836,44 +849,52 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
             </div>
 
             {/* DRAGGABLE CARD */}
-            {cloth && (
-              <div
-                ref={cardRef}
-                onMouseDown={handleMouseDown}
-                onTouchStart={handleMouseDown}
-                style={{
-                  width: "clamp(90px, 12vw, 120px)",
-                  height: "clamp(90px, 12vw, 120px)",
-                  marginTop: "-10px",
-                  background:
-                    "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
-                  borderRadius: "25px",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  margin: "10px auto 0 auto",
-                  cursor: isDragging ? "grabbing" : "grab",
-                  boxShadow: "0 15px 40px rgba(0,0,0,0.5)",
-                  position: "relative",
-                  transform: `translate(${dragPos.x}px, ${dragPos.y}px)`,
-                  transition: isDragging ? "none" : "transform 0.2s",
-                  border: "5px solid rgba(255,255,255,0.5)",
-                }}
-              >
-                <span
+            <div
+              style={{
+                width: "100%",
+                display: "flex",
+                justifyContent: "center",
+                paddingBottom: "30px", // reserves space so it won’t overflow
+              }}
+            >
+              {cloth && (
+                <div
+                  ref={cardRef}
+                  onMouseDown={handleMouseDown}
+                  onTouchStart={handleMouseDown}
                   style={{
-                    fontSize: "36px",
-                    fontWeight: "900",
-                    color: COLOR_MAP[cloth.color],
-                    textShadow: "3px 3px 6px rgba(0,0,0,0.5)",
-                    letterSpacing: "2px",
+                    width: "clamp(80px, 14vw, 110px)",
+                    height: "clamp(80px, 14vw, 110px)",
+                    marginTop: "-5px", // less negative push
+                    background:
+                      "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+                    borderRadius: "25px",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: isDragging ? "grabbing" : "grab",
+                    boxShadow: "0 15px 40px rgba(0,0,0,0.5)",
+                    position: "relative",
+                    transform: `translate(${dragPos.x}px, ${dragPos.y}px)`,
+                    transition: isDragging ? "none" : "transform 0.2s",
+                    border: "5px solid rgba(255,255,255,0.5)",
                   }}
                 >
-                  {cloth.word}
-                </span>
-              </div>
-            )}
+                  <span
+                    style={{
+                      fontSize: "28px", // slightly smaller text on mobile
+                      fontWeight: "900",
+                      color: COLOR_MAP[cloth.color],
+                      textShadow: "3px 3px 6px rgba(0,0,0,0.5)",
+                      letterSpacing: "2px",
+                    }}
+                  >
+                    {cloth.word}
+                  </span>
+                </div>
+              )}
+            </div>
           </>
         )}
       </div>
