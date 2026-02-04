@@ -453,6 +453,7 @@
       // --- 2. EYE TRACKING VARIABLES ---
       const LEFT_EYE = { outer: 33, inner: 133, iris: 468 };
       const RIGHT_EYE = { outer: 263, inner: 362, iris: 473 };
+      let camera;
 
       // Experiment State
       const PRO_TRIALS = 5; // number of PRO trials
@@ -482,6 +483,16 @@
       const STABILIZATION_FRAMES = 8;
       const MIN_REACTION_TIME_MS = 200;
 
+      function stopCamera() {
+        if (camera) {
+          try {
+            camera.stop();
+            console.log("📷 Camera stopped.");
+          } catch (err) {
+            console.warn("Camera was already stopped:", err);
+          }
+        }
+      }
       // --- 3. CORE LOGIC ---
 
       function toggleInvert() {
@@ -808,8 +819,16 @@
       async function sendResultsToAPI() {
         const metrics = computeMetrics();
 
+        const userId = localStorage.getItem("currentUserId"); // ✅ FIX
+
+        if (!userId) {
+          alert("❌ User ID missing! Restart test.");
+          console.error("No userId found in localStorage");
+          return;
+        }
+
         const payload = {
-          userId: "abc", // MUST match CSV user_id
+          userId: userId,
           eyeTrackingResult: {
             metrics,
             trials: experimentResults,
@@ -832,6 +851,7 @@
           const result = await response.json();
           console.log("✅ Backend response:", result);
           alert("✅ Eye tracking saved!");
+          stopCamera();   // ✅ NEW LINE
         } catch (err) {
           console.error("❌ API error:", err);
           alert("❌ Failed to send data");
@@ -856,7 +876,7 @@
       });
       faceMesh.onResults(onResults);
 
-      const camera = new Camera(videoElement, {
+      camera = new Camera(videoElement, {
         onFrame: async () => {
           await faceMesh.send({ image: videoElement });
         },

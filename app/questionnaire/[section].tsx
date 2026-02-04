@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -17,7 +18,7 @@ const SECTIONS = {
     type: "mixed" as SectionType,
     fields: [
       { key: "name", label: "What is your name?" },
-      
+
       { key: "age", label: "What is your age?" },
       { key: "profession", label: "What is your profession?" },
       {
@@ -281,6 +282,7 @@ export default function QuestionnaireScreen() {
       if (!res.ok) throw new Error("API failed");
 
       console.log("✅ Questionnaire saved successfully");
+      await AsyncStorage.setItem("currentUserId", username);
 
       router.replace({
         pathname: "/result",

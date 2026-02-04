@@ -1,13 +1,20 @@
 import { useCameraPermissions } from "expo-camera";
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Platform, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Platform,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { WebView } from "react-native-webview";
 import * as FileSystem from "expo-file-system";
 import { Asset } from "expo-asset";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function EyeTestScreen() {
   const [htmlContent, setHtmlContent] = useState<string | null>(null);
-
+  const webViewRef = React.useRef<any>(null);
   // ================= MOBILE =================
   if (Platform.OS !== "web") {
     const [permission, requestPermission] = useCameraPermissions();
@@ -27,22 +34,57 @@ export default function EyeTestScreen() {
       loadHtml();
     }, []);
 
-    if (!permission) return <View style={styles.loading}><ActivityIndicator /></View>;
+    if (!permission)
+      return (
+        <View style={styles.loading}>
+          <ActivityIndicator />
+        </View>
+      );
     if (!permission.granted)
-      return <View style={styles.loading}><Text style={styles.text}>Camera permission needed.</Text></View>;
+      return (
+        <View style={styles.loading}>
+          <Text style={styles.text}>Camera permission needed.</Text>
+        </View>
+      );
 
     if (!htmlContent)
-      return <View style={styles.loading}><ActivityIndicator /></View>;
+      return (
+        <View style={styles.loading}>
+          <ActivityIndicator />
+        </View>
+      );
 
     return (
       <View style={styles.container}>
         <WebView
+          ref={webViewRef} // ✅ IMPORTANT
           originWhitelist={["*"]}
           source={{ html: htmlContent }}
           javaScriptEnabled
           domStorageEnabled
           allowsInlineMediaPlayback
           mediaPlaybackRequiresUserAction={false}
+          /* --- STEP A: Ask React Native for the userId --- */
+          injectedJavaScript={`
+    window.ReactNativeWebView.postMessage("GET_USER");
+    true;
+  `}
+          /* --- STEP B: Receive userId from React Native and send it into the page --- */
+          onMessage={async (event) => {
+            if (event.nativeEvent.data === "GET_USER") {
+              const uid = await AsyncStorage.getItem("currentUserId");
+
+              if (!uid) {
+                console.error("No stored userId found!");
+                return;
+              }
+
+              webViewRef.current?.injectJavaScript(`
+        localStorage.setItem("currentUserId", "${uid}");
+        console.log("UserId set in WebView:", "${uid}");
+      `);
+            }
+          }}
         />
       </View>
     );
@@ -63,6 +105,11 @@ export default function EyeTestScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "black" },
-  loading: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "black" },
+  loading: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "black",
+  },
   text: { color: "white" },
 });
