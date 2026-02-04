@@ -17,7 +17,9 @@ const SECTIONS = {
     type: "mixed" as SectionType,
     fields: [
       { key: "name", label: "What is your name?" },
+      
       { key: "age", label: "What is your age?" },
+      { key: "profession", label: "What is your profession?" },
       {
         key: "sleep_hours",
         label: "How many hours of sleep do you get per night on average?",
@@ -177,6 +179,16 @@ export default function QuestionnaireScreen() {
         }
         if (!/^[A-Za-z\s]+$/.test(answer.trim())) {
           return "Name must contain only alphabets (no numbers or symbols).";
+        }
+        continue;
+      }
+      // ✅ PROFESSION validation (only text allowed)
+      if (field.key === "profession") {
+        if (!answer || answer.trim() === "") {
+          return "Please enter your profession.";
+        }
+        if (!/^[A-Za-z\s]+$/.test(answer.trim())) {
+          return "Profession must contain only alphabets (no numbers or symbols).";
         }
         continue;
       }
@@ -362,6 +374,7 @@ function buildQuestionnaireResponse(allAnswers: Record<string, any>) {
   return {
     section_1: {
       age: Number(allAnswers.age),
+      profession: allAnswers.profession || "",
       sleep_hours: Number(allAnswers.sleep_hours),
       exercise_days: Number(allAnswers.exercise_days),
       family_dementia: Number(allAnswers.family_dementia),
