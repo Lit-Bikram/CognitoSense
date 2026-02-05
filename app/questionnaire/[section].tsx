@@ -332,8 +332,18 @@ export default function QuestionnaireScreen() {
                     label={field.label}
                     value={answers[field.key]?.toString() || ""}
                     onChangeText={(val) => updateAnswer(field.key, val)}
-                    keyboardType={field.key === "name" ? "default" : "numeric"} // ✅ FIX
-                    placeholder={field.key === "name" ? "Enter your name" : "0"}
+                    keyboardType={
+                      field.key === "name" || field.key === "profession"
+                        ? "default"
+                        : "numeric"
+                    }
+                    placeholder={
+                      field.key === "name"
+                        ? "Enter your name"
+                        : field.key === "profession"
+                          ? "Enter your profession"
+                          : "0"
+                    }
                   />
                 ))
               : currentSection.fields.map((field) => (
