@@ -290,7 +290,7 @@ export default function MoneyManager({ onBack }: { onBack?: () => void } = {}) {
             </div>
           </div>
 
-          <div style={styles.card}>
+          {/* <div style={styles.card}>
             <h3 style={styles.sectionTitle}>Decision Summary</h3>
             <div style={styles.resultRow}>
               <span>Important Items:</span>
@@ -341,9 +341,9 @@ export default function MoneyManager({ onBack }: { onBack?: () => void } = {}) {
                 {overBudgetCount}
               </span>
             </div>
-          </div>
+          </div> */}
 
-          {logs.length > 0 && (
+          {/* {logs.length > 0 && (
             <div style={styles.card}>
               <h3 style={styles.sectionTitle}>Detailed Log</h3>
               <div style={styles.logContainer}>
@@ -387,7 +387,7 @@ export default function MoneyManager({ onBack }: { onBack?: () => void } = {}) {
                 ))}
               </div>
             </div>
-          )}
+          )} */}
 
           <div style={styles.buttonRow}>
             {/* <button style={styles.downloadButton} onClick={downloadCSV}>
@@ -429,7 +429,7 @@ export default function MoneyManager({ onBack }: { onBack?: () => void } = {}) {
         <div style={styles.itemCard}>
           <h2 style={styles.itemTitle}>{item.title}</h2>
           <p style={styles.itemCost}>Cost: ₹{item.cost}</p>
-          <div
+          {/* <div
             style={{
               ...styles.priorityBadge,
               backgroundColor: item.must ? "#ffebee" : "#e3f2fd",
@@ -437,17 +437,13 @@ export default function MoneyManager({ onBack }: { onBack?: () => void } = {}) {
             }}
           >
             {item.must ? "⚠️ Important" : "🎯 Optional"}
-          </div>
+          </div> */}
           {!canAfford && (
             <p style={styles.warningText}>⚠️ Not enough budget remaining!</p>
           )}
         </div>
 
-        <p style={styles.hintText}>
-          {item.must
-            ? "Important bills must be paid to avoid penalties!"
-            : "Think carefully - can you afford this optional expense?"}
-        </p>
+        <p style={styles.hintText}>Decide whether to pay or skip this item.</p>
 
         <div style={styles.buttonRow}>
           <button style={styles.payButton} onClick={() => handleDecision(true)}>

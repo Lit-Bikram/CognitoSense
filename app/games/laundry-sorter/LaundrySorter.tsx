@@ -657,7 +657,7 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
         </button>
       )}
 
-      <div style={{ maxWidth: "900px", margin: "0 auto" }}>
+      <div style={{ maxWidth: "900px", margin: "0 auto", paddingTop: "80px" }}>
         {/* TITLE */}
         <div style={{ textAlign: "center", marginBottom: "20px" }}>
           <h1
@@ -716,7 +716,7 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
             >
               <p
                 style={{
-                  color: "white",
+                  color: "#2b2b2b",
                   fontSize: "14px", // smaller
                   fontWeight: "800",
                   textAlign: "center",
@@ -729,26 +729,29 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
 
               <p
                 style={{
-                  color: "white",
+                  color: "#2b2b2b", // <-- main text color (much more visible)
                   textAlign: "center",
-                  lineHeight: "1.4", // tighter spacing
-                  fontSize: "15px", // smaller text
+                  lineHeight: "1.4",
+                  fontSize: "15px",
                   fontWeight: "600",
                   marginTop: "6px",
                 }}
               >
                 {rule === "WORD" ? (
                   <>
-                    📝 The word says "<strong>{cloth?.word}</strong>" - Drag to
-                    the <strong>{cloth?.word}</strong> zone!
+                    📝 The word says{" "}
+                    <strong style={{ color: "#1f2937" }}>{cloth?.word}</strong>{" "}
+                    — Drag to the{" "}
+                    <strong style={{ color: "#1f2937" }}>{cloth?.word}</strong>{" "}
+                    zone!
                   </>
                 ) : (
                   <>
                     🎨 The ink color is{" "}
-                    <strong style={{ color: COLOR_MAP[cloth?.color] }}>
-                      {cloth?.color}
-                    </strong>{" "}
-                    - Drag to the <strong>{cloth?.color}</strong> zone!
+                    <strong style={{ color: "#1f2937" }}>{cloth?.color}</strong>{" "}
+                    — Drag to the{" "}
+                    <strong style={{ color: "#1f2937" }}>{cloth?.color}</strong>{" "}
+                    zone!
                   </>
                 )}
               </p>

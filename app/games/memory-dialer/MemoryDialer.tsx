@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import Confetti from "react-confetti";
 import {
-    ImageBackground,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ImageBackground,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { useAuth } from "../../../context/AuthContext";
 
@@ -45,6 +45,9 @@ export default function MemoryDialer({ onBack }: Props) {
     "correct" | "incorrect" | null
   >(null);
   const { username, isAuthenticated } = useAuth();
+  const [isLevelActive, setIsLevelActive] = useState(false);
+  const [readyToSubmit, setReadyToSubmit] = useState(false);
+
   const generateSequence = (lvl: number) =>
     Array.from({ length: lvl + 3 }, () => Math.floor(Math.random() * 10)).join(
       "",
@@ -68,6 +71,7 @@ export default function MemoryDialer({ onBack }: Props) {
     setPressTimes([]);
     setLevelResult(null);
     setShowTarget(true);
+    setIsLevelActive(true); // ✅ disable button now
 
     const displayTime = mode === "word" ? 4000 : 2500;
 
@@ -85,44 +89,60 @@ export default function MemoryDialer({ onBack }: Props) {
     setUserInput(newInput);
 
     if (newInput.length === target.length) {
-      const endTime = Date.now();
-      const totalTime = endTime - startTime;
-
-      const correct = target
-        .split("")
-        .filter((d, i) => d === newInput[i]).length;
-
-      const accuracy = (correct / target.length) * 100;
-      const incorrectOrder = newInput !== target;
-
-      const rts = pressTimes.map((t, i) =>
-        i === 0 ? t - startTime : t - pressTimes[i - 1],
-      );
-
-      setLogs((prev) => [
-        ...prev,
-        {
-          Level: level,
-          Mode: mode,
-          SequenceLength: target.length,
-          Accuracy: accuracy.toFixed(2),
-          TotalRecallTimeMs: totalTime,
-          ReactionTimes: rts.join("|"),
-          ErrorPattern: incorrectOrder ? "Incorrect Order" : "None",
-        },
-      ]);
-
-      setLevelResult(accuracy === 100 ? "correct" : "incorrect");
-
-      setTimeout(() => {
-        if (level === 5) {
-          setGameComplete(true);
-          setShowConfetti(true);
-        } else {
-          setLevel(level + 1);
-        }
-      }, 1200);
+      setIsLevelActive(false);
+      setReadyToSubmit(true);
+      return;
     }
+  };
+
+  const submitAnswer = () => {
+    const endTime = Date.now();
+    const totalTime = endTime - startTime;
+
+    const correct = target
+      .split("")
+      .filter((d, i) => d === userInput[i]).length;
+
+    const accuracy = (correct / target.length) * 100;
+    const incorrectOrder = userInput !== target;
+
+    const rts = pressTimes.map((t, i) =>
+      i === 0 ? t - startTime : t - pressTimes[i - 1],
+    );
+
+    setLogs((prev) => [
+      ...prev,
+      {
+        Level: level,
+        Mode: mode,
+        SequenceLength: target.length,
+        Accuracy: accuracy.toFixed(2),
+        TotalRecallTimeMs: totalTime,
+        ReactionTimes: rts.join("|"),
+        ErrorPattern: incorrectOrder ? "Incorrect Order" : "None",
+      },
+    ]);
+
+    setLevelResult(accuracy === 100 ? "correct" : "incorrect");
+    setReadyToSubmit(false); // reset
+
+    setTimeout(() => {
+      if (level === 5) {
+        setGameComplete(true);
+        setShowConfetti(true);
+      } else {
+        setLevel(level + 1);
+      }
+    }, 1200);
+  };
+
+  const eraseLastDigit = () => {
+    if (showTarget || gameComplete || userInput.length === 0) return;
+
+    setUserInput((prev) => prev.slice(0, -1));
+
+    // also remove last timestamp so reaction times stay correct
+    setPressTimes((prev) => prev.slice(0, -1));
   };
 
   useEffect(() => {
@@ -236,12 +256,24 @@ export default function MemoryDialer({ onBack }: Props) {
         )}
 
         {!gameComplete && (
-          <TouchableOpacity style={styles.startBtn} onPress={startLevel}>
+          <TouchableOpacity
+            style={[
+              styles.startBtn,
+              isLevelActive && { opacity: 0.5 }, // visual feedback
+            ]}
+            onPress={startLevel}
+            disabled={isLevelActive} // 🔥 ACTUAL DISABLE
+          >
             <Text style={styles.btnText}>Start Level</Text>
           </TouchableOpacity>
         )}
 
         <Text style={styles.input}>{userInput}</Text>
+        {readyToSubmit && (
+          <TouchableOpacity style={styles.submitBtn} onPress={submitAnswer}>
+            <Text style={styles.btnText}>✔ Submit</Text>
+          </TouchableOpacity>
+        )}
 
         <View
           style={[styles.keypad, showTarget && { opacity: 0.3 }]}
@@ -256,6 +288,14 @@ export default function MemoryDialer({ onBack }: Props) {
               <Text style={styles.keyText}>{d}</Text>
             </TouchableOpacity>
           ))}
+
+          {/* 🔹 NEW ERASE BUTTON 🔹 */}
+          <TouchableOpacity
+            style={[styles.key, styles.eraseKey]}
+            onPress={eraseLastDigit}
+          >
+            <Text style={styles.keyText}>⌫</Text>
+          </TouchableOpacity>
         </View>
 
         {gameComplete && (
@@ -339,4 +379,13 @@ const styles = StyleSheet.create({
     width: "90%",
   },
   finalTitle: { fontSize: 18, fontWeight: "bold", color: "#4e342e" },
+  eraseKey: {
+    backgroundColor: "#8d6e63", // lighter brown for visibility
+  },
+  submitBtn: {
+    backgroundColor: "#2e7d32",
+    padding: 12,
+    borderRadius: 10,
+    marginVertical: 10,
+  },
 });

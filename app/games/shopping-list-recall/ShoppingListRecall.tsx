@@ -136,13 +136,26 @@ export default function ShoppingListRecall({ onBack }: { onBack: () => void }) {
   };
 
   const selectItem = (name: string) => {
-    if (selected.includes(name)) return;
     const now = Date.now();
+
+    // If already selected → REMOVE it (deselect)
+    if (selected.includes(name)) {
+      setSelected(prev => prev.filter(item => item !== name));
+
+      // also remove last reaction time + order entry for consistency
+      reactionTimes.current.pop();
+      order.current.pop();
+      return;
+    }
+
+    // Otherwise → ADD it (select)
     reactionTimes.current.push(now - lastClick.current);
     lastClick.current = now;
     order.current.push(name);
-    setSelected((prev) => [...prev, name]);
+
+    setSelected(prev => [...prev, name]);
   };
+
 
   const useHint = () => {
     if (hintUses > 0) return;
