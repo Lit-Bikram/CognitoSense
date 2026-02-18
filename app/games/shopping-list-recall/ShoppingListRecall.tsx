@@ -234,7 +234,7 @@ export default function ShoppingListRecall({ onBack }: { onBack: () => void }) {
       allMetrics.current.filter((l) => l.hintUses > 0).length / levels;
 
     try {
-      await fetch("https://api.cognitosense.in/api/game", {
+      await fetch(process.env.API_URL + "api/game", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

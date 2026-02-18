@@ -876,7 +876,7 @@
 
         try {
           const response = await fetch(
-            "https://api.cognitosense.in/api/eye-tracking",
+            process.env.API_URL + "api/eye-tracking",
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },

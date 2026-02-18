@@ -271,7 +271,7 @@ export default function QuestionnaireScreen() {
       console.log("📤 Sending questionnaire payload:", payload);
 
       const res = await fetch(
-        "https://api.cognitosense.in/api/questionnaire",
+        process.env.API_URL + "api/questionnaire",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

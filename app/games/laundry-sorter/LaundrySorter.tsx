@@ -146,7 +146,7 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
         : 0;
 
     try {
-      await fetch("https://api.cognitosense.in/api/game", {
+      await fetch(process.env.API_URL + "api/game", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
