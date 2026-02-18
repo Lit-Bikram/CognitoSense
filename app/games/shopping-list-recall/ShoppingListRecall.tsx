@@ -1,14 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import Confetti from "react-confetti";
 import {
-    FlatList,
-    Image,
-    ImageBackground,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  FlatList,
+  Image,
+  ImageBackground,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { useAuth } from "../../../context/AuthContext";
 
@@ -234,7 +234,7 @@ export default function ShoppingListRecall({ onBack }: { onBack: () => void }) {
       allMetrics.current.filter((l) => l.hintUses > 0).length / levels;
 
     try {
-      await fetch("https://cognito-sense-backend-4.onrender.com/api/game", {
+      await fetch("https://api.cognitosense.in/api/game", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

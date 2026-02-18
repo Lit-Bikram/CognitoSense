@@ -271,7 +271,7 @@ export default function QuestionnaireScreen() {
       console.log("📤 Sending questionnaire payload:", payload);
 
       const res = await fetch(
-        "https://cognito-sense-backend-4.onrender.com/api/questionnaire",
+        "https://api.cognitosense.in/api/questionnaire",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -325,35 +325,35 @@ export default function QuestionnaireScreen() {
             <Text style={styles.sectionTitle}>{currentSection.title}</Text>
 
             {currentSection.type === "numeric" ||
-            currentSection.type === "mixed"
+              currentSection.type === "mixed"
               ? currentSection.fields.map((field) => (
-                  <Input
-                    key={field.key}
-                    label={field.label}
-                    value={answers[field.key]?.toString() || ""}
-                    onChangeText={(val) => updateAnswer(field.key, val)}
-                    keyboardType={
-                      field.key === "name" || field.key === "profession"
-                        ? "default"
-                        : "numeric"
-                    }
-                    placeholder={
-                      field.key === "name"
-                        ? "Enter your name"
-                        : field.key === "profession"
-                          ? "Enter your profession"
-                          : "0"
-                    }
-                  />
-                ))
+                <Input
+                  key={field.key}
+                  label={field.label}
+                  value={answers[field.key]?.toString() || ""}
+                  onChangeText={(val) => updateAnswer(field.key, val)}
+                  keyboardType={
+                    field.key === "name" || field.key === "profession"
+                      ? "default"
+                      : "numeric"
+                  }
+                  placeholder={
+                    field.key === "name"
+                      ? "Enter your name"
+                      : field.key === "profession"
+                        ? "Enter your profession"
+                        : "0"
+                  }
+                />
+              ))
               : currentSection.fields.map((field) => (
-                  <RadioButton
-                    key={field.key}
-                    label={field.label}
-                    value={answers[field.key]}
-                    onChange={(val) => updateAnswer(field.key, val)}
-                  />
-                ))}
+                <RadioButton
+                  key={field.key}
+                  label={field.label}
+                  value={answers[field.key]}
+                  onChange={(val) => updateAnswer(field.key, val)}
+                />
+              ))}
 
             <View style={styles.buttons}>
               {sectionNum > 1 && (

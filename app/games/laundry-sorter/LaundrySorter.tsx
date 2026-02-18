@@ -142,11 +142,11 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
     const avgReactionTime =
       totalAttempts > 0
         ? logs.current.reduce((sum, log) => sum + log.reactionTime_s, 0) /
-          totalAttempts
+        totalAttempts
         : 0;
 
     try {
-      await fetch("https://cognito-sense-backend-4.onrender.com/api/game", {
+      await fetch("https://api.cognitosense.in/api/game", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -304,9 +304,9 @@ export default function LaundrySorter({ onBack }: { onBack?: () => void }) {
   const avgReactionTime =
     totalAttempts > 0
       ? (
-          logs.current.reduce((sum, log) => sum + log.reactionTime_s, 0) /
-          totalAttempts
-        ).toFixed(2)
+        logs.current.reduce((sum, log) => sum + log.reactionTime_s, 0) /
+        totalAttempts
+      ).toFixed(2)
       : "0";
 
   if (finished) {

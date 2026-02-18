@@ -126,7 +126,7 @@ export default function MoneyManager({ onBack }: { onBack?: () => void } = {}) {
     const overBudgetCount = logs.filter((l) => l.overBudget).length;
 
     try {
-      await fetch("https://cognito-sense-backend-4.onrender.com/api/game", {
+      await fetch("https://api.cognitosense.in/api/games", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -226,8 +226,8 @@ export default function MoneyManager({ onBack }: { onBack?: () => void } = {}) {
     const overBudgetCount = logs.filter((l) => l.overBudget).length;
     const avgRt = logs.length
       ? +(
-          logs.reduce((sum, l) => sum + l.reactionTime, 0) / logs.length
-        ).toFixed(2)
+        logs.reduce((sum, l) => sum + l.reactionTime, 0) / logs.length
+      ).toFixed(2)
       : 0;
 
     const perfectMust = mustPaid === mustTotal && mustSkipped === 0;
