@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -270,16 +271,12 @@ export default function QuestionnaireScreen() {
 
       console.log("📤 Sending questionnaire payload:", payload);
 
-      const res = await fetch(
-        process.env.API_URL + "api/questionnaire",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        },
+      const res = await axios.post(
+        process.env.EXPO_PUBLIC_API_URL + "api/questionnaire",
+        payload,
       );
 
-      if (!res.ok) throw new Error("API failed");
+      if (res.status !== 200) throw new Error("API failed");
 
       console.log("✅ Questionnaire saved successfully");
       await AsyncStorage.setItem("currentUserId", username);
