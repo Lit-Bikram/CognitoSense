@@ -875,8 +875,9 @@
         console.log("📤 Sending eye tracking payload:", payload);
 
         try {
+          const apiUrl = localStorage.getItem("apiUrl") || "";
           const response = await fetch(
-            process.env.API_URL + "api/eye-tracking",
+            apiUrl + "api/eye-tracking",
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },

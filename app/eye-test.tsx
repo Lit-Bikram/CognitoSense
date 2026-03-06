@@ -1,4 +1,7 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Asset } from "expo-asset";
 import { useCameraPermissions } from "expo-camera";
+import * as FileSystem from "expo-file-system";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -8,9 +11,6 @@ import {
   View,
 } from "react-native";
 import { WebView } from "react-native-webview";
-import * as FileSystem from "expo-file-system";
-import { Asset } from "expo-asset";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function EyeTestScreen() {
   const [htmlContent, setHtmlContent] = useState<string | null>(null);
@@ -79,8 +79,10 @@ export default function EyeTestScreen() {
                 return;
               }
 
+              const apiUrl = process.env.EXPO_PUBLIC_API_URL || "";
               webViewRef.current?.injectJavaScript(`
         localStorage.setItem("currentUserId", "${uid}");
+        localStorage.setItem("apiUrl", "${apiUrl}");
         console.log("UserId set in WebView:", "${uid}");
       `);
             }
@@ -91,6 +93,12 @@ export default function EyeTestScreen() {
   }
 
   // ================= WEB (PC) =================
+  useEffect(() => {
+    if (Platform.OS === "web") {
+      localStorage.setItem("apiUrl", process.env.EXPO_PUBLIC_API_URL || "");
+    }
+  }, []);
+
   return (
     <View style={styles.container}>
       <iframe

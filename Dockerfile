@@ -9,7 +9,7 @@ RUN npm install
 COPY . .
 
 ARG EXPO_PUBLIC_API_URL
-ENV EXPO_PUBLIC_API_URL=$EXPO_PUBLIC_API_URL
+RUN echo "EXPO_PUBLIC_API_URL=${EXPO_PUBLIC_API_URL}" > .env
 
 RUN npx expo export --platform web
 

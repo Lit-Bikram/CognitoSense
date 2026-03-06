@@ -175,7 +175,7 @@ export default function MemoryDialer({ onBack }: Props) {
       logs.filter((l) => l.ErrorPattern !== "None").length / levelsCompleted;
 
     try {
-      await fetch(process.env.API_URL + "api/game", {
+      await fetch(process.env.EXPO_PUBLIC_API_URL + "api/game", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
